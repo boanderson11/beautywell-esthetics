@@ -53,7 +53,7 @@ nav.scrolled {
   letter-spacing: 0.5px;
   text-decoration: none;
   display: inline-flex;
-  align-items: center;
+  align-items: baseline;
   gap: 5px;
 }
 .logo em {
