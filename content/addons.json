@@ -1,0 +1,58 @@
+{
+  "addons": [
+    {
+      "id": "dermaplaning",
+      "name": "Dermaplaning",
+      "price": 35,
+      "description": "Removes peach fuzz and dead skin for a silky finish and flawless makeup application."
+    },
+    {
+      "id": "nuface",
+      "name": "Microcurrent Sculpt",
+      "price": 35,
+      "description": "Microcurrent lifting and contouring — instant jawline definition and cheek lift."
+    },
+    {
+      "id": "led",
+      "name": "LED Light Boost",
+      "price": 30,
+      "description": "LED mask therapy added to any facial for collagen stimulation and calming."
+    },
+    {
+      "id": "guasha",
+      "name": "Gua Sha Lymphatic",
+      "price": 30,
+      "description": "Stone massage to sculpt, de-puff, and encourage circulation and lymphatic flow."
+    },
+    {
+      "id": "serum",
+      "name": "Deep Serum Infusion",
+      "price": 25,
+      "description": "Device-assisted serum delivery for maximum product absorption and visible results."
+    },
+    {
+      "id": "eye",
+      "name": "Eye Rescue",
+      "price": 20,
+      "description": "Hydrogel under-eye patches with cooling massage to brighten and de-puff."
+    },
+    {
+      "id": "lip",
+      "name": "Lip Renewal",
+      "price": 15,
+      "description": "Gentle exfoliation and nourishing mask for soft, smooth, refreshed lips."
+    },
+    {
+      "id": "wax-lip-addon",
+      "name": "Lip Wax",
+      "price": 15,
+      "description": "Quick, precise upper lip waxing for a smooth, clean finish."
+    },
+    {
+      "id": "wax-brow-addon",
+      "name": "Brow Wax",
+      "price": 25,
+      "description": "Custom shaping to frame your face — brows mapped, waxed, and tidied."
+    }
+  ]
+}

@@ -1,0 +1,75 @@
+{
+  "facials": [
+    {
+      "id": "signature",
+      "name": "Beautywell Signature Facial",
+      "tag": "Most Popular",
+      "duration": "60 Minutes",
+      "price": 125,
+      "description": "A fully customized facial tailored to your skin's needs. Double cleanse, enzyme exfoliation, steam, extractions, custom mask, and finishing serums with device-assisted infusion for deep product penetration.",
+      "benefits": ["Deep Cleansing", "Customized", "Instant Glow"]
+    },
+    {
+      "id": "hydralux",
+      "name": "HydraLux Infusion",
+      "tag": "Best Seller",
+      "duration": "60 Minutes",
+      "price": 165,
+      "description": "An intensely hydrating treatment using hyaluronic layering and device-assisted infusion to drive active ingredients deep into the skin. Finished with a collagen bio-cellulose mask for plumped, dewy results.",
+      "benefits": ["Deep Hydration", "Plumping", "Barrier Repair"]
+    },
+    {
+      "id": "timeless",
+      "name": "Timeless Renewal",
+      "tag": "Premium",
+      "duration": "60 Minutes",
+      "price": 195,
+      "description": "Our most luxurious anti-aging ritual. Microcurrent therapy sculpts and lifts facial contours while peptide serums are infused deep into the skin. Finished with a firming mask for visibly tighter, radiant skin.",
+      "benefits": ["Fine Line Reduction", "Lifted Contours", "Luminous"]
+    },
+    {
+      "id": "peel",
+      "name": "Brilliance Peel",
+      "tag": "Results-Driven",
+      "duration": "45 Minutes",
+      "price": 145,
+      "description": "A professional-grade chemical peel using a customized blend of AHAs, BHAs, and botanical brighteners. Targets hyperpigmentation, texture, acne scarring, and uneven tone with visible results after one session.",
+      "benefits": ["Resurfaced Texture", "Even Tone", "Cell Turnover"]
+    },
+    {
+      "id": "lumin",
+      "name": "Lumin LED Therapy",
+      "tag": "Trending",
+      "duration": "60 Minutes",
+      "price": 155,
+      "description": "Harnesses clinical-grade LED wavelengths paired with a calming enzyme treatment. Red light stimulates collagen, blue light targets acne bacteria, and near-infrared reduces inflammation deep within the skin.",
+      "benefits": ["Collagen Boost", "Acne Clearing", "Calming"]
+    }
+  ],
+  "waxing": [
+    {
+      "id": "wax-lip",
+      "name": "Upper Lip Wax",
+      "tag": "",
+      "duration": "10 Minutes",
+      "price": 15,
+      "description": "Quick, precise removal for a smooth, clean finish."
+    },
+    {
+      "id": "wax-brow",
+      "name": "Brow Shaping Wax",
+      "tag": "",
+      "duration": "15 Minutes",
+      "price": 25,
+      "description": "Custom shaping to frame your face — brows mapped, waxed, and tidied."
+    },
+    {
+      "id": "wax-combo",
+      "name": "Lip + Brow Wax",
+      "tag": "Save $5",
+      "duration": "20 Minutes",
+      "price": 35,
+      "description": "Both services together at a combined rate."
+    }
+  ]
+}

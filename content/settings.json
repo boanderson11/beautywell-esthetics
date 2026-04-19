@@ -1,0 +1,18 @@
+{
+  "businessName": "Beautywell Esthetics",
+  "tagline": "Skincare, rooted in ritual.",
+  "heroSubtitle": "A private, intentional space for custom facials. Every session is tailored to your skin, your story, and your season of life — delivered with clinical-grade products and quiet luxury.",
+  "aboutText1": "Beautywell Esthetics is a licensed private studio built on the belief that the best results come from customized care.",
+  "aboutText2": "Focused on you, treatment is delivered in a studio designed to feel like the exhale at the end of a long week. Every facial is customized in real time — your skin today is not your skin last month, and your ritual should reflect that.",
+  "email": "hello@beautywellesthetics.com",
+  "phone": "(310) 555-0142",
+  "location": "Cypress, California",
+  "locationNote": "Exact address shared upon booking confirmation.",
+  "hoursWeekday": "Tuesday – Friday · 5:30 PM – 8:30 PM",
+  "hoursSaturday": "Saturday · 9:00 AM – 5:00 PM",
+  "hoursClosed": "Sunday & Monday · Closed",
+  "bookingNote": "Select your treatment, find a time that works, and we'll confirm within a few hours. A 50% deposit is required to hold your appointment — non-refundable if cancelled within 48 hours.",
+  "depositPolicy": "All appointments require a 50% deposit to hold your spot. Deposits are non-refundable if cancelled within 48 hours of your appointment. You'll receive payment instructions in your confirmation email.",
+  "googleCalendarSrc": "",
+  "googleCalendarNote": "Paste your Google Calendar embed URL here. Go to Google Calendar → Settings → your calendar → Scroll to 'Integrate calendar' → Copy the embed URL."
+}
