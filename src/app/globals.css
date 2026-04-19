@@ -52,16 +52,18 @@ nav.scrolled {
   color: var(--sage-deep);
   letter-spacing: 0.5px;
   text-decoration: none;
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
 }
 .logo em {
   font-family: 'Pinyon Script', cursive;
   font-weight: 400;
   font-style: normal;
   color: var(--terracotta);
-  font-size: 21px;
+  font-size: 22px;
   letter-spacing: 0;
-  position: relative;
-  top: 3px;
+  line-height: 1;
 }
 .nav-links {
   display: flex;
