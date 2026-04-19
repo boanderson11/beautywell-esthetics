@@ -8,8 +8,8 @@
 [context.production.environment]
   NEXT_TELEMETRY_DISABLED = "1"
 
-# Allow the CMS admin route
+# Decap CMS (desktop fallback)
 [[redirects]]
-  from = "/admin"
-  to = "/admin/index.html"
+  from = "/cms"
+  to = "/cms/index.html"
   status = 200
