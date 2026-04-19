@@ -60,7 +60,8 @@ nav.scrolled {
   color: var(--terracotta);
   font-size: 21px;
   letter-spacing: 0;
-  vertical-align: 4px;
+  position: relative;
+  top: 3px;
 }
 .nav-links {
   display: flex;
