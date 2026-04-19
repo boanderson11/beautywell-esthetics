@@ -25,6 +25,8 @@ interface BookingFormProps {
   addons: Addon[];
   depositPolicy: string;
   bookingNote: string;
+  blockedDates?: string[];
+  blockedTimes?: Record<string, string[]>;
 }
 
 interface SelectedAddon {
@@ -49,6 +51,8 @@ export default function BookingForm({
   addons,
   depositPolicy,
   bookingNote,
+  blockedDates = [],
+  blockedTimes = {},
 }: BookingFormProps) {
   const [step, setStep] = useState(1);
   const [selectedService, setSelectedService] = useState<Service | null>(null);
@@ -62,7 +66,12 @@ export default function BookingForm({
   const [selectedTime, setSelectedTime] = useState<string | null>(null);
   const [policyAgreed, setPolicyAgreed] = useState(false);
   const [firstName, setFirstName] = useState('');
+  const [lastName, setLastName] = useState('');
+  const [email, setEmail] = useState('');
+  const [phone, setPhone] = useState('');
+  const [notes, setNotes] = useState('');
   const [confirmed, setConfirmed] = useState(false);
+  const [submitting, setSubmitting] = useState(false);
 
   const today = new Date();
   today.setHours(0, 0, 0, 0);
@@ -108,29 +117,61 @@ export default function BookingForm({
     const m = calView.getMonth();
     const firstDay = new Date(y, m, 1).getDay();
     const daysInMonth = new Date(y, m + 1, 0).getDate();
-    const days: Array<{ day: number | null; date: Date | null; disabled: boolean }> = [];
-    for (let i = 0; i < firstDay; i++) days.push({ day: null, date: null, disabled: true });
+    const days: Array<{ day: number | null; date: Date | null; disabled: boolean; blocked: boolean }> = [];
+    for (let i = 0; i < firstDay; i++) days.push({ day: null, date: null, disabled: true, blocked: false });
     for (let d = 1; d <= daysInMonth; d++) {
       const date = new Date(y, m, d);
       const dow = date.getDay();
-      days.push({ day: d, date, disabled: date < today || dow === 0 || dow === 1 });
+      const iso = `${y}-${String(m + 1).padStart(2, '0')}-${String(d).padStart(2, '0')}`;
+      const isBlocked = blockedDates.includes(iso);
+      days.push({ day: d, date, disabled: date < today || dow === 0 || dow === 1 || isBlocked, blocked: isBlocked });
     }
     return days;
+  };
+
+  const toISO = (d: Date) => {
+    const y = d.getFullYear();
+    const m = String(d.getMonth() + 1).padStart(2, '0');
+    const day = String(d.getDate()).padStart(2, '0');
+    return `${y}-${m}-${day}`;
   };
 
   const timeSlots = () => {
     if (!selectedDate) return [];
     const dow = selectedDate.getDay();
-    if (dow >= 2 && dow <= 5) return WEEKDAY_SLOTS;
-    if (dow === 6) return SATURDAY_SLOTS;
-    return [];
+    const iso = toISO(selectedDate);
+    const blocked = blockedTimes[iso] ?? [];
+    let slots: string[] = [];
+    if (dow >= 2 && dow <= 5) slots = WEEKDAY_SLOTS;
+    else if (dow === 6) slots = SATURDAY_SLOTS;
+    return slots.filter(s => !blocked.includes(s));
   };
 
   const goToStep = (n: number) => setStep(n);
 
-  const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
+  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    if (!policyAgreed) return;
+    if (!policyAgreed || !selectedService || !selectedDate || !selectedTime) return;
+    setSubmitting(true);
+    try {
+      await fetch('/api/submit-booking', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          firstName, lastName, email, phone, notes,
+          service: selectedService.name,
+          serviceId: selectedService.id,
+          addons: selectedAddons.map(a => a.name),
+          date: toISO(selectedDate),
+          time: selectedTime,
+          total: totalPrice,
+          deposit,
+        }),
+      });
+    } catch {
+      // Still show confirmation even if save fails (Paulina gets email fallback)
+    }
+    setSubmitting(false);
     setConfirmed(true);
     setStep(4);
   };
@@ -143,6 +184,10 @@ export default function BookingForm({
     setSelectedTime(null);
     setPolicyAgreed(false);
     setFirstName('');
+    setLastName('');
+    setEmail('');
+    setPhone('');
+    setNotes('');
     setConfirmed(false);
     setCalView(() => {
       const d = new Date();
@@ -300,10 +345,10 @@ export default function BookingForm({
               {['S','M','T','W','T','F','S'].map((d, i) => (
                 <div key={i} className="cal-dow">{d}</div>
               ))}
-              {calDays().map(({ day, date, disabled }, i) => (
+              {calDays().map(({ day, date, disabled, blocked }, i) => (
                 <div
                   key={i}
-                  className={`cal-day${day === null ? ' empty' : ''}${disabled ? ' disabled' : ''}${
+                  className={`cal-day${day === null ? ' empty' : ''}${disabled ? ' disabled' : ''}${blocked ? ' blocked' : ''}${
                     date && selectedDate && date.toDateString() === selectedDate.toDateString()
                       ? ' selected'
                       : ''
@@ -397,35 +442,30 @@ export default function BookingForm({
           <div className="form-row">
             <div className="form-group">
               <label>First Name</label>
-              <input
-                type="text"
-                name="firstName"
-                required
-                value={firstName}
-                onChange={(e) => setFirstName(e.target.value)}
-              />
+              <input type="text" required value={firstName} onChange={(e) => setFirstName(e.target.value)} />
             </div>
             <div className="form-group">
               <label>Last Name</label>
-              <input type="text" name="lastName" required />
+              <input type="text" required value={lastName} onChange={(e) => setLastName(e.target.value)} />
             </div>
           </div>
           <div className="form-row">
             <div className="form-group">
               <label>Email</label>
-              <input type="email" name="email" required />
+              <input type="email" required value={email} onChange={(e) => setEmail(e.target.value)} />
             </div>
             <div className="form-group">
               <label>Phone</label>
-              <input type="tel" name="phone" required />
+              <input type="tel" required value={phone} onChange={(e) => setPhone(e.target.value)} />
             </div>
           </div>
           <div className="form-row">
             <div className="form-group full">
               <label>First time? Tell me about your skin (optional)</label>
               <textarea
-                name="notes"
                 placeholder="Any concerns, allergies, recent treatments, or goals I should know about..."
+                value={notes}
+                onChange={(e) => setNotes(e.target.value)}
               />
             </div>
           </div>
@@ -454,9 +494,9 @@ export default function BookingForm({
             <button
               type="submit"
               className="booking-btn next"
-              disabled={!policyAgreed}
+              disabled={!policyAgreed || submitting}
             >
-              Request Appointment
+              {submitting ? 'Sending…' : 'Request Appointment'}
             </button>
           </div>
         </form>

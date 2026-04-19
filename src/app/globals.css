@@ -720,6 +720,7 @@ section { padding: 120px 48px; position: relative; }
 .cal-day:hover:not(.disabled) { background: var(--sage-wash); }
 .cal-day.selected { background: var(--sage-deep); color: var(--bone); }
 .cal-day.disabled { color: var(--sage-mist); cursor: not-allowed; }
+.cal-day.blocked { background: rgba(107,68,35,0.08); color: var(--sage-mist); cursor: not-allowed; text-decoration: line-through; }
 .cal-day.empty { visibility: hidden; }
 .time-slots {
   display: grid;
