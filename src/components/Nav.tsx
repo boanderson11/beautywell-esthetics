@@ -40,7 +40,7 @@ export default function Nav() {
     <>
       <nav id="nav" className={scrolled ? 'scrolled' : ''}>
         <a href="#" className="logo">
-          Beautywell<em>.</em>
+          Beautywell <em>Esthetics</em>
         </a>
         <ul className="nav-links">
           <li><a href="#about">About</a></li>

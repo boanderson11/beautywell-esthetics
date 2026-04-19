@@ -240,7 +240,7 @@ export default function Home() {
       {/* ── FOOTER ───────────────────────────────────────────────── */}
       <footer>
         <a href="#" className="logo">
-          Beautywell<em>.</em>
+          Beautywell <em>Esthetics</em>
         </a>
         <p className="footer-tagline">{tagline}</p>
         <ul className="footer-links">
