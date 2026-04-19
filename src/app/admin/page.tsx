@@ -104,7 +104,7 @@ function LoginScreen() {
     <div style={{ minHeight:'100vh', display:'flex', alignItems:'center', justifyContent:'center', background:'#f5f1e8', padding:'24px' }}>
       <div style={{ textAlign:'center', width:'100%', maxWidth:'320px' }}>
         <div style={{ fontFamily:"'Cormorant Garamond',serif", fontSize:'36px', color:'#3d5240', marginBottom:'4px', fontWeight:300 }}>
-          Beautywell <span style={{ fontFamily:"'Pinyon Script',cursive", color:'#6b4423', fontStyle:'normal', fontSize:'48px', verticalAlign:'middle', letterSpacing:0 }}>Esthetics</span>
+          Beautywell <span style={{ fontFamily:"'Great Vibes',cursive", color:'#6b4423', fontStyle:'normal', fontSize:'48px', verticalAlign:'middle', letterSpacing:0 }}>Esthetics</span>
         </div>
         <div style={{ fontSize:'11px', color:'#7a7268', letterSpacing:'3px', textTransform:'uppercase', marginBottom:'40px' }}>Admin Portal</div>
         <button onClick={() => (window as any).netlifyIdentity?.open()}
@@ -343,7 +343,7 @@ export default function AdminPage() {
       <div style={{ background:'#3d5240', color:'#faf7ef', padding:'14px 20px', display:'flex', justifyContent:'space-between', alignItems:'center', position:'sticky', top:0, zIndex:10 }}>
         <div>
           <span style={{ fontFamily:"'Cormorant Garamond',serif", fontSize:'22px', fontWeight:500 }}>
-            Beautywell <span style={{ fontFamily:"'Pinyon Script',cursive", color:'#8a6a4a', fontStyle:'normal', fontSize:'30px', verticalAlign:'middle', letterSpacing:0 }}>Esthetics</span>
+            Beautywell <span style={{ fontFamily:"'Great Vibes',cursive", color:'#8a6a4a', fontStyle:'normal', fontSize:'30px', verticalAlign:'middle', letterSpacing:0 }}>Esthetics</span>
           </span>
           <span style={{ fontSize:'11px', color:'rgba(197,207,190,0.75)', letterSpacing:'1.5px', textTransform:'uppercase', marginLeft:'10px' }}>Admin</span>
         </div>
