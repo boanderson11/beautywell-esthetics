@@ -523,6 +523,14 @@ export default function BookingForm({
             spot will be held once the deposit clears.
           </p>
 
+          <p className="confirmation-text" style={{ marginTop: -4 }}>
+            <strong>First-time client?</strong> Please complete your{' '}
+            <a href="/intake" style={{ color: 'var(--terracotta)', textDecoration: 'underline' }}>
+              intake &amp; consent form
+            </a>{' '}
+            before your appointment.
+          </p>
+
           {/* Add to Calendar buttons */}
           <div style={{ display: 'flex', gap: 12, justifyContent: 'center', flexWrap: 'wrap', marginBottom: 20 }}>
             <button

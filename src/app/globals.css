@@ -1073,6 +1073,262 @@ footer .logo em { color: var(--terracotta-soft); }
   color: rgba(197, 207, 190, 0.6);
 }
 
+/* ============ INTAKE FORM PAGE ============ */
+.intake-page {
+  background: var(--bone);
+  min-height: 100vh;
+}
+.intake-nav {
+  padding: 20px 48px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background: rgba(250, 247, 239, 0.92);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border-bottom: 1px solid var(--sage-mist);
+  position: sticky;
+  top: 0;
+  z-index: 50;
+}
+.intake-nav-back {
+  font-size: 11px;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  color: var(--earth-soft);
+  text-decoration: none;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  transition: color 0.2s;
+}
+.intake-nav-back:hover { color: var(--sage-deep); }
+.intake-hero {
+  max-width: 900px;
+  margin: 0 auto;
+  padding: 72px 48px 40px;
+  text-align: center;
+}
+.intake-hero .section-label {
+  justify-content: center;
+  display: inline-flex;
+}
+.intake-hero h1 {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: clamp(40px, 5vw, 64px);
+  font-weight: 300;
+  line-height: 1.05;
+  color: var(--sage-deep);
+  margin: 20px 0 20px;
+  letter-spacing: -0.01em;
+}
+.intake-hero h1 em { font-style: italic; color: var(--terracotta); }
+.intake-hero p {
+  font-size: 16px;
+  line-height: 1.75;
+  color: var(--earth-soft);
+  max-width: 620px;
+  margin: 0 auto;
+}
+.intake-container {
+  max-width: 900px;
+  margin: 0 auto;
+  padding: 0 48px 100px;
+}
+.intake-form {
+  background: var(--bone);
+  border: 1px solid var(--sage-mist);
+  padding: 48px;
+  border-radius: 4px;
+}
+.intake-step { display: none; }
+.intake-step.active { display: block; animation: fadeIn 0.4s ease; }
+.intake-fieldset {
+  border: none;
+  margin: 0 0 28px;
+  padding: 0;
+}
+.intake-fieldset legend {
+  font-size: 11px;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  color: var(--muted);
+  margin-bottom: 12px;
+  padding: 0;
+}
+.intake-check-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 8px;
+}
+.intake-check-grid.single { grid-template-columns: 1fr; }
+.intake-check-item {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  padding: 12px 14px;
+  border: 1px solid var(--sage-mist);
+  background: var(--bone);
+  border-radius: 2px;
+  cursor: pointer;
+  transition: all 0.2s;
+  font-size: 14px;
+  color: var(--earth-soft);
+  line-height: 1.5;
+}
+.intake-check-item:hover { border-color: var(--sage); }
+.intake-check-item.checked {
+  border-color: var(--terracotta);
+  background: rgba(107, 68, 35, 0.05);
+}
+.intake-check-item input {
+  margin-top: 3px;
+  accent-color: var(--sage-deep);
+  width: 15px;
+  height: 15px;
+  flex-shrink: 0;
+}
+.intake-check-item span { flex: 1; }
+.intake-radio-row {
+  display: flex;
+  gap: 16px;
+  flex-wrap: wrap;
+}
+.intake-radio-row label {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 18px;
+  border: 1px solid var(--sage-mist);
+  background: var(--bone);
+  border-radius: 2px;
+  cursor: pointer;
+  font-size: 14px;
+  color: var(--earth-soft);
+  transition: all 0.2s;
+}
+.intake-radio-row label.checked {
+  border-color: var(--terracotta);
+  background: rgba(107, 68, 35, 0.05);
+  color: var(--sage-deep);
+}
+.intake-radio-row input { accent-color: var(--sage-deep); }
+.intake-notice {
+  background: var(--sage-wash);
+  border-left: 3px solid var(--terracotta);
+  padding: 14px 18px;
+  margin: 12px 0 0;
+  border-radius: 2px;
+  font-size: 13px;
+  line-height: 1.6;
+  color: var(--earth-soft);
+}
+.intake-consent-block {
+  background: var(--cream);
+  border: 1px solid var(--sage-mist);
+  border-radius: 2px;
+  padding: 24px 26px;
+  margin-bottom: 20px;
+}
+.intake-consent-block h4 {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 22px;
+  font-weight: 500;
+  color: var(--sage-deep);
+  margin-bottom: 14px;
+  letter-spacing: -0.01em;
+}
+.intake-consent-text {
+  font-size: 14px;
+  line-height: 1.75;
+  color: var(--earth-soft);
+  margin-bottom: 16px;
+}
+.intake-consent-text + .intake-consent-text { margin-top: -4px; }
+.intake-consent-check {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  padding: 12px 14px;
+  background: var(--bone);
+  border: 1px solid var(--sage-mist);
+  border-radius: 2px;
+  cursor: pointer;
+  font-size: 14px;
+  color: var(--earth-soft);
+  line-height: 1.5;
+  font-weight: 500;
+  transition: all 0.2s;
+}
+.intake-consent-check:hover { border-color: var(--sage); }
+.intake-consent-check.checked {
+  border-color: var(--terracotta);
+  background: rgba(107, 68, 35, 0.05);
+  color: var(--sage-deep);
+}
+.intake-consent-check input {
+  margin-top: 2px;
+  accent-color: var(--sage-deep);
+  width: 16px;
+  height: 16px;
+  flex-shrink: 0;
+}
+.intake-error {
+  background: rgba(107, 68, 35, 0.08);
+  border-left: 3px solid var(--terracotta);
+  padding: 12px 16px;
+  margin-top: 16px;
+  border-radius: 2px;
+  font-size: 13px;
+  color: var(--clay);
+}
+.intake-signature-block {
+  margin-top: 28px;
+  padding: 24px 26px;
+  background: var(--sage-wash);
+  border-radius: 2px;
+}
+.intake-signature-block p {
+  font-size: 13px;
+  line-height: 1.65;
+  color: var(--earth-soft);
+  margin-bottom: 18px;
+}
+.intake-signature-block input[type="text"] {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 22px;
+  font-style: italic;
+  color: var(--sage-deep);
+  letter-spacing: 0.5px;
+}
+.intake-footer-note {
+  max-width: 900px;
+  margin: 0 auto;
+  padding: 0 48px 40px;
+  font-size: 11px;
+  line-height: 1.6;
+  color: var(--muted);
+  text-align: center;
+  font-style: italic;
+}
+.intake-confirmation {
+  text-align: center;
+  padding: 40px 0;
+}
+.intake-confirmation .confirmation-title { margin-bottom: 16px; }
+.intake-confirmation .confirmation-text { margin-bottom: 32px; }
+@media (max-width: 960px) {
+  .intake-nav { padding: 14px 20px; }
+  .intake-hero { padding: 48px 20px 28px; }
+  .intake-container { padding: 0 20px 60px; }
+  .intake-form { padding: 28px 20px; }
+  .intake-check-grid { grid-template-columns: 1fr; }
+  .intake-consent-block { padding: 20px 18px; }
+  .intake-consent-block h4 { font-size: 20px; }
+  .intake-signature-block { padding: 20px 18px; }
+  .intake-footer-note { padding: 0 20px 32px; }
+}
+
 /* ============ ANIMATIONS ============ */
 @keyframes fadeUp {
   from { opacity: 0; transform: translateY(24px); }
