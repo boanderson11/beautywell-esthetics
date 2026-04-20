@@ -134,7 +134,21 @@ export default function Home() {
                 Book your <em>ritual.</em>
               </h2>
             </div>
-            <p className="section-intro">{bookingNote}</p>
+            <p className="section-intro">
+              {bookingNote}
+              {' '}
+              <a
+                href="/intake"
+                style={{
+                  color: 'var(--terracotta-soft)',
+                  textDecoration: 'underline',
+                  textUnderlineOffset: 3,
+                  fontWeight: 500,
+                }}
+              >
+                New client? Complete your intake &amp; consent form →
+              </a>
+            </p>
           </div>
           <BookingForm
             facials={facials}
@@ -247,6 +261,7 @@ export default function Home() {
           <li><a href="#about">About</a></li>
           <li><a href="#booking">Services</a></li>
           <li><a href="#booking">Book</a></li>
+          <li><a href="/intake">Intake Form</a></li>
           <li><a href="#contact">Contact</a></li>
         </ul>
         <div className="footer-bottom">
