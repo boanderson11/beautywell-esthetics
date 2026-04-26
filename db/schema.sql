@@ -61,3 +61,13 @@ CREATE TABLE IF NOT EXISTS admin_users (
   created_at      timestamptz NOT NULL DEFAULT now(),
   last_login_at   timestamptz
 );
+
+-- Editable content (services, addons, settings, calendar). Each row holds the
+-- full JSON payload for one content area. Falls back to the on-disk JSON files
+-- in content/ when no DB row exists, so a fresh install still serves the
+-- starter content until the admin makes their first save.
+CREATE TABLE IF NOT EXISTS content_blocks (
+  key         text PRIMARY KEY,
+  value       jsonb NOT NULL,
+  updated_at  timestamptz NOT NULL DEFAULT now()
+);

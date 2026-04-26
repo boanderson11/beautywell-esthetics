@@ -1,28 +1,33 @@
-import fs from 'fs';
-import path from 'path';
 import Nav from '@/components/Nav';
 import BookingForm from '@/components/BookingForm';
 import ContactForm from '@/components/ContactForm';
+import { getContent } from '@/lib/content-store';
 
-// ── Load content from JSON files ──────────────────────────────────────────────
-function loadContent() {
-  const readJSON = (file: string) =>
-    JSON.parse(fs.readFileSync(path.join(process.cwd(), 'content', file), 'utf-8'));
+// Reads from Postgres via content-store, falling back to the on-disk JSON
+// in content/ when no DB row exists yet (fresh install). Forces a dynamic
+// render so admin saves are reflected immediately.
+export const dynamic = 'force-dynamic';
 
-  const services = readJSON('services.json');
-  const addonsData = readJSON('addons.json');
-  const settings = readJSON('settings.json');
+type Settings = {
+  businessName: string; tagline: string; heroSubtitle: string;
+  aboutText1: string; aboutText2: string; email: string; phone: string;
+  location: string; locationNote: string; hoursWeekday: string;
+  hoursSaturday: string; hoursClosed: string; bookingNote: string;
+  depositPolicy: string; googleCalendarSrc: string;
+};
+type Facial = { id: string; name: string; tag?: string; duration: string; price: number; description: string; benefits?: string[] };
+type Waxing = { id: string; name: string; tag?: string; duration: string; price: number; description: string };
+type Addon  = { id: string; name: string; price: number; description: string };
 
-  return {
-    facials: services.facials,
-    waxing: services.waxing,
-    addons: addonsData.addons,
-    settings,
-  };
-}
-
-export default function Home() {
-  const { facials, waxing, addons, settings } = loadContent();
+export default async function Home() {
+  const [services, addonsData, settings] = await Promise.all([
+    getContent<{ facials: Facial[]; waxing: Waxing[] }>('services'),
+    getContent<{ addons: Addon[] }>('addons'),
+    getContent<Settings>('settings'),
+  ]);
+  const facials = services.facials;
+  const waxing = services.waxing;
+  const addons = addonsData.addons;
   const {
     businessName,
     tagline,

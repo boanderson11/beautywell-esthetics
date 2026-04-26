@@ -20,24 +20,6 @@ export default function RootLayout({
           href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;0,600;1,300;1,400;1,500&family=Inter:wght@300;400;500;600&family=Great+Vibes&display=swap"
           rel="stylesheet"
         />
-        {/* Netlify Identity widget — handles invite/password-reset flows on the main site */}
-        {/* eslint-disable-next-line @next/next/no-sync-scripts */}
-        <script src="https://identity.netlify.com/v1/netlify-identity-widget.js" />
-        <script
-          dangerouslySetInnerHTML={{
-            __html: `
-              if (window.netlifyIdentity) {
-                window.netlifyIdentity.on("init", function(user) {
-                  if (!user) {
-                    window.netlifyIdentity.on("login", function() {
-                      document.location.href = "/admin/";
-                    });
-                  }
-                });
-              }
-            `,
-          }}
-        />
       </head>
       <body>{children}</body>
     </html>
