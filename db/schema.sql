@@ -20,8 +20,20 @@ CREATE TABLE IF NOT EXISTS bookings (
   stripe_session_id     text UNIQUE,
   stripe_payment_intent text,
   paid_at         timestamptz,
-  expires_at      timestamptz
+  expires_at      timestamptz,
+  -- Reminder + intake tracking. Set by /api/cron/send-reminders and
+  -- /api/submit-intake respectively. NULL means "not yet sent / completed".
+  reminder_sent_at        timestamptz,
+  intake_reminder_sent_at timestamptz,
+  intake_completed_at     timestamptz,
+  intake_id               text
 );
+
+-- Idempotent migrations for existing deployments.
+ALTER TABLE bookings ADD COLUMN IF NOT EXISTS reminder_sent_at        timestamptz;
+ALTER TABLE bookings ADD COLUMN IF NOT EXISTS intake_reminder_sent_at timestamptz;
+ALTER TABLE bookings ADD COLUMN IF NOT EXISTS intake_completed_at     timestamptz;
+ALTER TABLE bookings ADD COLUMN IF NOT EXISTS intake_id               text;
 
 -- Foolproof: only one active booking per (date, time_slot).
 -- An "active" booking is either awaiting payment or already paid.
