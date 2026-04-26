@@ -122,6 +122,7 @@ export async function POST(req: NextRequest) {
       ],
       metadata: { booking_id: bookingId },
       payment_intent_data: { metadata: { booking_id: bookingId } },
+      allow_promotion_codes: true,
       success_url: `${env.SITE_URL}/booking/success?id=${bookingId}`,
       cancel_url: `${env.SITE_URL}/booking/cancelled?id=${bookingId}`,
     });
