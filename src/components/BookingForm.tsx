@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { WEEKDAY_SLOTS, SATURDAY_SLOTS } from '@/lib/slots';
 
 interface Service {
@@ -45,6 +45,7 @@ export default function BookingForm({
   addons,
   depositPolicy,
 }: BookingFormProps) {
+  const formRef = useRef<HTMLDivElement>(null);
   const [step, setStep] = useState(1);
   const [selectedService, setSelectedService] = useState<Service | null>(null);
   const [selectedAddons, setSelectedAddons] = useState<SelectedAddon[]>([]);
@@ -85,6 +86,13 @@ export default function BookingForm({
       cancelled = true;
     };
   }, []);
+
+  // Scroll form into view when step changes
+  useEffect(() => {
+    if (formRef.current) {
+      formRef.current.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }
+  }, [step]);
 
   const today = new Date();
   today.setHours(0, 0, 0, 0);
@@ -211,7 +219,7 @@ export default function BookingForm({
     : '';
 
   return (
-    <div className="booking-form">
+    <div className="booking-form" ref={formRef}>
       {/* Progress */}
       <div className="booking-progress">
         {[
