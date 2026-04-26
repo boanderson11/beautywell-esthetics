@@ -147,18 +147,89 @@ After editing, commit and push — Netlify rebuilds automatically.
 
 ---
 
-## 📧 Connecting the Booking Form to Email
+## 💳 Booking Backend (Stripe + Resend + Postgres)
 
-Currently the booking form shows a confirmation screen but doesn't send an email. To receive booking requests in your inbox, add a **Netlify Form** or connect to **Formspree**:
+The booking form takes a 50% deposit via Stripe Checkout, holds the slot in Postgres
+with a unique-per-slot constraint (so two clients cannot book the same time), and
+emails both the customer and the owner once payment clears.
 
-### Option A — Netlify Forms (free, easiest)
-Add `netlify` attribute to the form tag in `BookingForm.tsx` and Netlify will capture submissions. View them in your Netlify dashboard → Forms.
+### Required env vars
 
-### Option B — Formspree
-1. Create a free account at [formspree.io](https://formspree.io)
-2. Get your form endpoint
-3. Update the form's `action` attribute in `BookingForm.tsx`
+Copy `.env.example` to `.env.local` for local dev, and set the same values in
+Netlify → Site configuration → Environment variables for production:
+
+| Var | What it is |
+| --- | --- |
+| `DATABASE_URL` | Neon Postgres pooled connection string |
+| `STRIPE_SECRET_KEY` | Stripe secret key (`sk_test_...` or `sk_live_...`) |
+| `STRIPE_WEBHOOK_SECRET` | Stripe webhook signing secret (`whsec_...`) |
+| `RESEND_API_KEY` | Resend API key |
+| `FROM_EMAIL` | Verified sender, e.g. `Beautywell <hello@beautywell.com>` |
+| `OWNER_EMAIL` | Where new-booking notifications go |
+| `SITE_URL` | Public site URL, e.g. `https://beautywell.com` |
+
+### One-time setup
+
+1. **Neon.** Sign up at [neon.tech](https://neon.tech), create a project, copy the
+   pooled connection string. Run the schema:
+   ```bash
+   DATABASE_URL=postgres://... npm run migrate
+   ```
+2. **Stripe.** Sign up at [stripe.com](https://stripe.com). Copy the secret key.
+   Create a webhook endpoint pointed at `https://YOUR_DOMAIN/api/booking/webhook`
+   that subscribes to:
+   - `checkout.session.completed`
+   - `checkout.session.expired`
+   - `charge.refunded`
+   Copy the signing secret.
+3. **Resend.** Sign up at [resend.com](https://resend.com), verify your sending
+   domain, and create an API key. (For testing you can leave `FROM_EMAIL` unset
+   and the system will use `onboarding@resend.dev`.)
+
+### How it works
+
+```
+[Customer fills form]
+    ↓ POST /api/booking/create
+    ↓   server validates, computes price from services.json,
+    ↓   inserts row with status='pending_payment',
+    ↓   creates Stripe Checkout session (30-min expiry),
+    ↓   returns checkoutUrl
+[Stripe Checkout] → customer pays deposit
+    ↓ Stripe → POST /api/booking/webhook
+    ↓   verifies signature, marks booking 'confirmed',
+    ↓   sends confirmation emails (owner + customer)
+[/booking/success] → confirmation page with Apple/Google Calendar export
+```
+
+Slot uniqueness is guaranteed by a partial unique index on `(date, time_slot)
+WHERE status IN ('pending_payment','confirmed')`. Two simultaneous attempts → one
+succeeds, the other gets a clean 409 error.
+
+### Local dev with Stripe webhooks
+
+```bash
+# In one terminal:
+npm run dev
+
+# In another, forward webhooks to your local server:
+stripe listen --forward-to localhost:3000/api/booking/webhook
+# Copy the whsec_... it prints into your .env.local as STRIPE_WEBHOOK_SECRET
+```
+
+Use Stripe test card `4242 4242 4242 4242` with any future expiry and any CVC.
+
+### Refunds
+
+Issue refunds from the Stripe dashboard. The `charge.refunded` webhook will
+mark the booking as `cancelled`, releasing the slot.
+
+### Known follow-up
+
+The legacy `/admin` page still reads bookings from `content/bookings.json` (now
+unused) — confirmed bookings live in Postgres and email notifications keep the
+owner in the loop. Wiring `/admin` to read from the DB is a separate change.
 
 ---
 
-_Built with Next.js 14 · Deployed on Netlify · CMS by Decap_
+_Built with Next.js 14 · Stripe · Resend · Neon · Deployed on Netlify_
