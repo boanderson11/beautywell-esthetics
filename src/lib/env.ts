@@ -29,6 +29,7 @@ export const env = {
     }
     return v;
   },
+  get CRON_SECRET() { return required('CRON_SECRET'); },
 };
 
 export function envIsConfigured(): boolean {
