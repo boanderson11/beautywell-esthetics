@@ -5,6 +5,7 @@ import type { Booking, BookingStatus } from './types'
 import { Label } from './ui'
 import { fmtDate } from './cal-helpers'
 import { cancelBooking } from './api-client'
+import RescheduleForm from './RescheduleForm'
 
 const STATUS_STYLE: Record<BookingStatus, { bg: string; color: string; label: string }> = {
   confirmed:        { bg: '#e8ede3', color: '#3d5240', label: 'Confirmed' },
@@ -17,18 +18,19 @@ function dollars(cents: number) {
   return `$${(cents / 100).toFixed(0)}`
 }
 
-function BookingCard({ booking, onCancelled }: { booking: Booking; onCancelled: () => void }) {
+function BookingCard({ booking, onChanged }: { booking: Booking; onChanged: () => void }) {
   const [busy, setBusy] = useState(false)
   const [err, setErr] = useState('')
+  const [rescheduling, setRescheduling] = useState(false)
   const style = STATUS_STYLE[booking.status]
-  const canCancel = booking.status === 'confirmed' || booking.status === 'pending_payment'
+  const canModify = booking.status === 'confirmed' || booking.status === 'pending_payment'
 
   async function doCancel() {
     if (!confirm(`Cancel ${booking.first_name} ${booking.last_name} on ${booking.date} at ${booking.time_slot}?`)) return
     setBusy(true); setErr('')
     try {
       await cancelBooking(booking.id)
-      onCancelled()
+      onChanged()
     } catch (e) {
       setErr((e as Error).message)
       setBusy(false)
@@ -74,14 +76,31 @@ function BookingCard({ booking, onCancelled }: { booking: Booking; onCancelled: 
         <div style={{ fontSize: '12px', color: '#7a2020', marginBottom: '8px' }}>{err}</div>
       )}
 
-      {canCancel && (
-        <button
-          onClick={doCancel}
-          disabled={busy}
-          style={{ padding: '8px 14px', background: 'none', color: '#7a2020', border: '1px solid #f5b8b8', borderRadius: '3px', fontSize: '11px', letterSpacing: '1.5px', textTransform: 'uppercase', cursor: busy ? 'not-allowed' : 'pointer', fontFamily: 'inherit' }}
-        >
-          {busy ? 'Cancelling…' : 'Cancel Booking'}
-        </button>
+      {canModify && !rescheduling && (
+        <div style={{ display: 'flex', gap: '8px' }}>
+          <button
+            onClick={() => setRescheduling(true)}
+            disabled={busy}
+            style={{ padding: '8px 14px', background: 'none', color: '#3d5240', border: '1px solid #c5cfbe', borderRadius: '3px', fontSize: '11px', letterSpacing: '1.5px', textTransform: 'uppercase', cursor: busy ? 'not-allowed' : 'pointer', fontFamily: 'inherit' }}
+          >
+            Reschedule
+          </button>
+          <button
+            onClick={doCancel}
+            disabled={busy}
+            style={{ padding: '8px 14px', background: 'none', color: '#7a2020', border: '1px solid #f5b8b8', borderRadius: '3px', fontSize: '11px', letterSpacing: '1.5px', textTransform: 'uppercase', cursor: busy ? 'not-allowed' : 'pointer', fontFamily: 'inherit' }}
+          >
+            {busy ? 'Cancelling…' : 'Cancel Booking'}
+          </button>
+        </div>
+      )}
+
+      {rescheduling && (
+        <RescheduleForm
+          booking={booking}
+          onCancel={() => setRescheduling(false)}
+          onDone={() => { setRescheduling(false); onChanged() }}
+        />
       )}
     </div>
   )
@@ -133,7 +152,7 @@ export default function BookingsTab({
         </div>
       )}
 
-      {filtered.map(b => <BookingCard key={b.id} booking={b} onCancelled={reload} />)}
+      {filtered.map(b => <BookingCard key={b.id} booking={b} onChanged={reload} />)}
 
       <div style={{ paddingBottom: '48px' }} />
     </>
