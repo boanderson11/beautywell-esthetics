@@ -296,7 +296,17 @@ section { padding: 120px 48px; position: relative; }
   top: 0; left: 0;
   width: 75%;
   height: 75%;
+  background: #f4f0e4;
   box-shadow: 0 30px 60px rgba(61, 82, 64, 0.2);
+}
+.about-visual .image-block.main .about-logo {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  padding: 8%;
+  display: block;
 }
 .about-visual .image-block.sub {
   bottom: 0; right: 0;
@@ -314,12 +324,7 @@ section { padding: 120px 48px; position: relative; }
   display: block;
 }
 .about-visual .image-block.main::before {
-  content: '';
-  position: absolute;
-  inset: 0;
-  background:
-    radial-gradient(circle at 30% 30%, rgba(250, 247, 239, 0.15), transparent 60%),
-    radial-gradient(circle at 70% 70%, rgba(61, 82, 64, 0.3), transparent 60%);
+  content: none;
 }
 .about-visual .image-block.sub::before {
   content: '';
