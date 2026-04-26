@@ -44,7 +44,7 @@ export async function fetchBookingForDisplay(id: string): Promise<BookingDetails
   try {
     // Lazy import to keep this module tree-shakeable from edge contexts.
     const { getService } = await import('./services-lookup');
-    serviceDuration = getService(r.service_id)?.duration ?? null;
+    serviceDuration = (await getService(r.service_id))?.duration ?? null;
   } catch {
     // ignore
   }

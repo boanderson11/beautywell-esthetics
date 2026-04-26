@@ -1,8 +1,7 @@
 // Server-side service/addon lookup. The booking API uses this to compute pricing
-// from trusted JSON, so the client cannot tamper with totals.
+// from trusted content, so the client cannot tamper with totals.
 
-import fs from 'node:fs';
-import path from 'node:path';
+import { getContent } from './content-store';
 
 export type Service = {
   id: string;
@@ -19,13 +18,17 @@ export type Addon = {
   description: string;
 };
 
-let _cache: { services: Map<string, Service>; addons: Map<string, Addon> } | null = null;
+type ServicesPayload = { facials: Service[]; waxing: Service[] };
+type AddonsPayload = { addons: Addon[] };
 
-function load() {
-  if (_cache) return _cache;
-  const root = process.cwd();
-  const services = JSON.parse(fs.readFileSync(path.join(root, 'content', 'services.json'), 'utf-8'));
-  const addonsData = JSON.parse(fs.readFileSync(path.join(root, 'content', 'addons.json'), 'utf-8'));
+async function loadMaps(): Promise<{
+  services: Map<string, Service>;
+  addons: Map<string, Addon>;
+}> {
+  const [services, addonsData] = await Promise.all([
+    getContent<ServicesPayload>('services'),
+    getContent<AddonsPayload>('addons'),
+  ]);
 
   const serviceMap = new Map<string, Service>();
   for (const s of [...services.facials, ...services.waxing]) serviceMap.set(s.id, s);
@@ -33,16 +36,7 @@ function load() {
   const addonMap = new Map<string, Addon>();
   for (const a of addonsData.addons) addonMap.set(a.id, a);
 
-  _cache = { services: serviceMap, addons: addonMap };
-  return _cache;
-}
-
-export function getService(id: string): Service | undefined {
-  return load().services.get(id);
-}
-
-export function getAddon(id: string): Addon | undefined {
-  return load().addons.get(id);
+  return { services: serviceMap, addons: addonMap };
 }
 
 export type PriceCalc = {
@@ -52,13 +46,18 @@ export type PriceCalc = {
   depositCents: number;
 };
 
-export function priceFor(serviceId: string, addonIds: string[]): PriceCalc | { error: string } {
-  const service = getService(serviceId);
+export async function priceFor(
+  serviceId: string,
+  addonIds: string[],
+): Promise<PriceCalc | { error: string }> {
+  const { services, addons: addonMap } = await loadMaps();
+
+  const service = services.get(serviceId);
   if (!service) return { error: `Unknown service: ${serviceId}` };
 
   const addons: Addon[] = [];
   for (const id of addonIds) {
-    const a = getAddon(id);
+    const a = addonMap.get(id);
     if (!a) return { error: `Unknown add-on: ${id}` };
     addons.push(a);
   }
@@ -69,4 +68,9 @@ export function priceFor(serviceId: string, addonIds: string[]): PriceCalc | { e
   const depositCents = Math.round(totalCents / 2);
 
   return { service, addons, totalCents, depositCents };
+}
+
+export async function getService(id: string): Promise<Service | undefined> {
+  const { services } = await loadMaps();
+  return services.get(id);
 }

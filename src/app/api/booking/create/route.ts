@@ -32,12 +32,12 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: 'Submission rejected.' }, { status: 400 });
   }
 
-  const slotCheck = validateSlot(input.date, input.time);
+  const slotCheck = await validateSlot(input.date, input.time);
   if (!slotCheck.ok) {
     return NextResponse.json({ error: slotCheck.reason }, { status: 400 });
   }
 
-  const calc = priceFor(input.serviceId, input.addonIds);
+  const calc = await priceFor(input.serviceId, input.addonIds);
   if ('error' in calc) {
     return NextResponse.json({ error: calc.error }, { status: 400 });
   }
