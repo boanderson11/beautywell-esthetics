@@ -49,6 +49,20 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: 'Deposit amount is below the payment processor minimum.' }, { status: 400 });
   }
 
+  // Verify required env up front so a misconfigured deploy fails before we
+  // INSERT a pending_payment row that would otherwise be stranded when the
+  // Stripe step throws on a missing var.
+  try {
+    void env.STRIPE_SECRET_KEY;
+    void env.SITE_URL;
+  } catch (err) {
+    console.error('[booking/create] env misconfigured', err);
+    return NextResponse.json(
+      { error: 'Booking is temporarily unavailable. Please try again shortly.' },
+      { status: 503 },
+    );
+  }
+
   const bookingId = newBookingId();
   const expiresAt = new Date(Date.now() + SESSION_TTL_SECONDS * 1000);
 
@@ -108,6 +122,7 @@ export async function POST(req: NextRequest) {
       ],
       metadata: { booking_id: bookingId },
       payment_intent_data: { metadata: { booking_id: bookingId } },
+      allow_promotion_codes: true,
       success_url: `${env.SITE_URL}/booking/success?id=${bookingId}`,
       cancel_url: `${env.SITE_URL}/booking/cancelled?id=${bookingId}`,
     });
@@ -122,7 +137,21 @@ export async function POST(req: NextRequest) {
     `;
   } catch (err) {
     // Roll back the booking so the slot is freed if Stripe failed.
-    console.error('[booking/create] stripe session failed', { bookingId, err });
+    const e = err as {
+      type?: string;
+      code?: string;
+      statusCode?: number;
+      message?: string;
+      requestId?: string;
+    };
+    console.error('[booking/create] stripe session failed', {
+      bookingId,
+      type: e?.type,
+      code: e?.code,
+      statusCode: e?.statusCode,
+      requestId: e?.requestId,
+      message: e?.message,
+    });
     await sql`UPDATE bookings SET status = 'expired' WHERE id = ${bookingId}`;
     return NextResponse.json(
       { error: 'Could not start checkout. Please try again.' },
