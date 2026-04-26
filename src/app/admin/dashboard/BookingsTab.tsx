@@ -101,7 +101,9 @@ export default function BookingsTab({
     (b.status === 'confirmed' || b.status === 'pending_payment') &&
     new Date(b.date + 'T12:00:00') >= today
 
-  const filtered = bookings
+  // Hide expired bookings entirely — they hold no slot and add noise.
+  const visible = bookings.filter(b => b.status !== 'expired')
+  const filtered = visible
     .filter(b => filter === 'upcoming' ? isUpcoming(b) : true)
     .sort((a, b) => {
       const cmp = a.date.localeCompare(b.date)

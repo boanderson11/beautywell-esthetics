@@ -11,8 +11,9 @@ import AddonsTab from './AddonsTab'
 import SettingsTab from './SettingsTab'
 import CalendarTab from './CalendarTab'
 import BookingsTab from './BookingsTab'
+import AdminsTab from './AdminsTab'
 
-type TabKey = 'bookings' | 'pricing' | 'addons' | 'settings' | 'calendar'
+type TabKey = 'bookings' | 'pricing' | 'addons' | 'settings' | 'calendar' | 'admins'
 
 export default function Dashboard({ adminEmail }: { adminEmail: string }) {
   const router = useRouter()
@@ -104,6 +105,7 @@ export default function Dashboard({ adminEmail }: { adminEmail: string }) {
     { key: 'addons',   label: 'Add-Ons'  },
     { key: 'settings', label: 'Settings' },
     { key: 'calendar', label: 'Calendar' },
+    { key: 'admins',   label: 'Admins'   },
   ]
 
   const upcomingCount = bookings?.filter(b => {
@@ -194,6 +196,10 @@ export default function Dashboard({ adminEmail }: { adminEmail: string }) {
             saving={calSaving}
             message={calMsg}
           />
+        )}
+
+        {tab === 'admins' && (
+          <AdminsTab currentEmail={adminEmail} />
         )}
       </div>
     </div>
