@@ -131,8 +131,7 @@ nav.scrolled {
 .hero-botanical.top-right {
   top: 8%; right: -60px;
   width: 420px; height: auto;
-  opacity: 0.35;
-  mix-blend-mode: multiply;
+  opacity: 0.45;
 }
 .hero-botanical.bottom-left {
   bottom: -100px; left: -80px;

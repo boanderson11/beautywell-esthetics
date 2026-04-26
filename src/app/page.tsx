@@ -52,7 +52,7 @@ export default async function Home() {
 
       {/* ── HERO ────────────────────────────────────────────────── */}
       <header className="hero">
-        <img className="hero-botanical top-right" src="/hero-logo.jpg" alt="" aria-hidden="true" />
+        <img className="hero-botanical top-right" src="/hero-logo.png" alt="" aria-hidden="true" />
         <svg className="hero-botanical bottom-left" viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg">
           <circle cx="100" cy="100" r="60" fill="none" stroke="#6b4423" strokeWidth="1"/>
           <circle cx="100" cy="100" r="80" fill="none" stroke="#6b4423" strokeWidth="0.5"/>
