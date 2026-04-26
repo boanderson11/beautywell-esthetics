@@ -249,7 +249,7 @@ Site configuration → Environment variables → Add a variable:
 | Var | What it is |
 | --- | --- |
 | `SESSION_SECRET` | Random 64-char hex string used to sign session cookies. Generate one in your browser: open DevTools → Console → `crypto.getRandomValues(new Uint8Array(32)).reduce((s,b)=>s+b.toString(16).padStart(2,'0'),'')` |
-| `ADMIN_INITIAL_EMAIL` | The admin email, e.g. `bo@boanderson.com` |
+| `ADMIN_INITIAL_EMAIL` | The admin email |
 | `ADMIN_INITIAL_PASSWORD` | Initial password (≥12 chars). Used as the source of truth — every deploy syncs this value. |
 
 `DATABASE_URL` must already be set (it's required for the booking system too).
@@ -262,8 +262,8 @@ Deploy site**. The build will:
 1. Apply DB migrations (creates `admin_users` table)
 2. Create the admin user (or update its password to match the env var)
 
-You'll see lines like `[build-setup] ✓ Admin created: bo@boanderson.com` in the
-Netlify deploy log.
+You'll see a `[build-setup] ✓ Admin created: ...` line in the Netlify deploy
+log confirming the seed ran.
 
 ### Step 3 — Sign in
 
