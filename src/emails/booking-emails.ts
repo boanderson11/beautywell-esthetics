@@ -119,6 +119,105 @@ export function customerEmail(data: BookingEmailData): { subject: string; html: 
   return { subject, html, text };
 }
 
+export type RescheduleEmailData = BookingEmailData & {
+  previousDate: string;
+  previousTime: string;
+};
+
+export function customerRescheduledEmail(data: RescheduleEmailData): { subject: string; html: string; text: string } {
+  const subject = `Your Beautywell appointment has been rescheduled — ${formatDate(data.date)} at ${data.time}`;
+
+  const html = `<!doctype html>
+<html>
+  <body style="background:#faf7ef; margin:0;">
+    <div style="${baseStyles}">
+      <p style="${labelStyle}">Beautywell Esthetics</p>
+      <h1 style="font-family: 'Cormorant Garamond', Georgia, serif; font-weight: 400; font-size: 28px; color: #3d5240; margin: 8px 0 24px 0;">
+        Your appointment has been <em>rescheduled</em>.
+      </h1>
+      <p>Hi ${escape(data.firstName)},</p>
+      <p>Your Beautywell appointment has been moved. Please update your calendar.</p>
+
+      <div style="border:1px solid #c5cfbe; border-radius:4px; padding:20px; margin:24px 0;">
+        <p style="${labelStyle}">Previously</p>
+        <p style="margin:4px 0 16px 0; color:#7a7268; text-decoration: line-through;">${formatDate(data.previousDate)} at ${escape(data.previousTime)}</p>
+        <p style="${labelStyle}">New time</p>
+        <p style="margin:4px 0 16px 0; font-size:18px; color:#3d5240;">${formatDate(data.date)} at ${escape(data.time)}</p>
+        <p style="${labelStyle}">Service</p>
+        <p style="margin:4px 0 0 0;">${escape(data.serviceName)}</p>
+      </div>
+
+      <p style="font-size:13px; color:#7a7268; margin-top:32px;">
+        Your deposit is still applied to this appointment — no further action needed.
+        If this new time doesn&rsquo;t work, reply to this email and we&rsquo;ll find another.
+      </p>
+
+      <p style="font-size:12px; color:#7a7268; margin-top:24px;">
+        Booking reference: <code>${escape(data.id)}</code>
+      </p>
+    </div>
+  </body>
+</html>`;
+
+  const text = [
+    `Hi ${data.firstName},`,
+    '',
+    'Your Beautywell appointment has been rescheduled.',
+    '',
+    `Previously: ${formatDate(data.previousDate)} at ${data.previousTime}`,
+    `New time:   ${formatDate(data.date)} at ${data.time}`,
+    `Service:    ${data.serviceName}`,
+    '',
+    'Your deposit is still applied to this appointment.',
+    'If this new time doesn\'t work, reply to this email.',
+    '',
+    `Booking reference: ${data.id}`,
+  ].join('\n');
+
+  return { subject, html, text };
+}
+
+export function ownerRescheduledEmail(data: RescheduleEmailData): { subject: string; html: string; text: string } {
+  const subject = `Rescheduled — ${data.firstName} ${data.lastName} · now ${formatDate(data.date)} ${data.time}`;
+
+  const html = `<!doctype html>
+<html>
+  <body style="background:#faf7ef; margin:0;">
+    <div style="${baseStyles}">
+      <p style="${labelStyle}">Booking Rescheduled</p>
+      <h1 style="font-family: 'Cormorant Garamond', Georgia, serif; font-weight:400; font-size:26px; color:#3d5240; margin:8px 0 20px 0;">
+        ${escape(data.firstName)} ${escape(data.lastName)}
+      </h1>
+      <ul style="line-height:1.9; padding-left:20px;">
+        <li><strong>Was:</strong> <span style="color:#7a7268; text-decoration: line-through;">${formatDate(data.previousDate)} at ${escape(data.previousTime)}</span></li>
+        <li><strong>Now:</strong> ${formatDate(data.date)} at ${escape(data.time)}</li>
+        <li><strong>Service:</strong> ${escape(data.serviceName)}</li>
+        <li><strong>Email:</strong> <a href="mailto:${escape(data.email)}">${escape(data.email)}</a></li>
+        <li><strong>Phone:</strong> <a href="tel:${escape(data.phone)}">${escape(data.phone)}</a></li>
+      </ul>
+      <p style="font-size:12px; color:#7a7268; margin-top:24px;">
+        Reference: <code>${escape(data.id)}</code>
+      </p>
+    </div>
+  </body>
+</html>`;
+
+  const text = [
+    `Booking rescheduled.`,
+    '',
+    `Client: ${data.firstName} ${data.lastName}`,
+    `Was: ${formatDate(data.previousDate)} at ${data.previousTime}`,
+    `Now: ${formatDate(data.date)} at ${data.time}`,
+    `Service: ${data.serviceName}`,
+    `Email: ${data.email}`,
+    `Phone: ${data.phone}`,
+    '',
+    `Reference: ${data.id}`,
+  ].join('\n');
+
+  return { subject, html, text };
+}
+
 export function ownerEmail(data: BookingEmailData): { subject: string; html: string; text: string } {
   const subject = `New booking — ${data.firstName} ${data.lastName} · ${formatDate(data.date)} ${data.time}`;
   const addonsHtml = data.addons.length
