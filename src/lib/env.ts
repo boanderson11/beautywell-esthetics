@@ -22,6 +22,7 @@ export const env = {
   get OWNER_EMAIL() { return required('OWNER_EMAIL'); },
   get FROM_EMAIL() { return process.env.FROM_EMAIL || 'Beautywell <onboarding@resend.dev>'; },
   get SITE_URL() { return required('SITE_URL'); },
+  get CRON_SECRET() { return required('CRON_SECRET'); },
 };
 
 export function envIsConfigured(): boolean {
