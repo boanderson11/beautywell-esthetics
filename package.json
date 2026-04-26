@@ -4,10 +4,11 @@
   "private": true,
   "scripts": {
     "dev": "next dev",
-    "build": "next build",
+    "build": "tsx scripts/build-setup.ts && next build",
     "start": "next start",
     "lint": "next lint",
-    "migrate": "tsx scripts/migrate.ts"
+    "migrate": "tsx scripts/migrate.ts",
+    "seed:admin": "tsx scripts/seed-admin.ts"
   },
   "dependencies": {
     "@neondatabase/serverless": "^0.9.5",

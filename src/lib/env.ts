@@ -22,6 +22,13 @@ export const env = {
   get OWNER_EMAIL() { return required('OWNER_EMAIL'); },
   get FROM_EMAIL() { return process.env.FROM_EMAIL || 'Beautywell <onboarding@resend.dev>'; },
   get SITE_URL() { return required('SITE_URL'); },
+  get SESSION_SECRET() {
+    const v = required('SESSION_SECRET');
+    if (v.length < 32) {
+      throw new Error('SESSION_SECRET must be at least 32 characters');
+    }
+    return v;
+  },
   get CRON_SECRET() { return required('CRON_SECRET'); },
 };
 
