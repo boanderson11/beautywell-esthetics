@@ -93,10 +93,10 @@ export default async function Home() {
         <div className="about-grid">
           <div className="about-visual reveal">
             <div className="image-block main">
-              <img src="/about-logo.jpg" alt="Beautywell Esthetics emblem" className="about-logo" />
+              <img src="/about-facial.jpg" alt="Esthetician applying a facial mask with a fan brush" />
             </div>
             <div className="image-block sub">
-              <img src="/about-facial.jpg" alt="Esthetician applying a facial mask with a fan brush" />
+              <img src="/about-logo.jpg" alt="Beautywell Esthetics emblem" className="about-logo" />
             </div>
           </div>
           <div className="about-content reveal">
