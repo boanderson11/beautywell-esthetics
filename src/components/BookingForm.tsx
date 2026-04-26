@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
+import { WEEKDAY_SLOTS, SATURDAY_SLOTS } from '@/lib/slots';
 
 interface Service {
   id: string;
@@ -25,8 +26,6 @@ interface BookingFormProps {
   addons: Addon[];
   depositPolicy: string;
   bookingNote: string;
-  blockedDates?: string[];
-  blockedTimes?: Record<string, string[]>;
 }
 
 interface SelectedAddon {
@@ -39,20 +38,12 @@ const MONTH_NAMES = [
   'January','February','March','April','May','June',
   'July','August','September','October','November','December',
 ];
-const WEEKDAY_SLOTS = ['5:30 PM', '6:30 PM', '7:30 PM'];
-const SATURDAY_SLOTS = [
-  '9:00 AM','10:00 AM','11:00 AM','12:00 PM',
-  '1:00 PM','2:00 PM','3:00 PM','4:00 PM',
-];
 
 export default function BookingForm({
   facials,
   waxing,
   addons,
   depositPolicy,
-  bookingNote,
-  blockedDates = [],
-  blockedTimes = {},
 }: BookingFormProps) {
   const [step, setStep] = useState(1);
   const [selectedService, setSelectedService] = useState<Service | null>(null);
@@ -70,8 +61,30 @@ export default function BookingForm({
   const [email, setEmail] = useState('');
   const [phone, setPhone] = useState('');
   const [notes, setNotes] = useState('');
-  const [confirmed, setConfirmed] = useState(false);
+  const [website, setWebsite] = useState(''); // honeypot
   const [submitting, setSubmitting] = useState(false);
+  const [submitError, setSubmitError] = useState<string | null>(null);
+
+  const [blockedDates, setBlockedDates] = useState<string[]>([]);
+  const [blockedTimes, setBlockedTimes] = useState<Record<string, string[]>>({});
+
+  // Fetch live availability so taken slots from other customers are reflected.
+  useEffect(() => {
+    let cancelled = false;
+    fetch('/api/booking/availability')
+      .then((r) => (r.ok ? r.json() : { blockedDates: [], blockedTimes: {} }))
+      .then((data) => {
+        if (cancelled) return;
+        setBlockedDates(Array.isArray(data.blockedDates) ? data.blockedDates : []);
+        setBlockedTimes(data.blockedTimes && typeof data.blockedTimes === 'object' ? data.blockedTimes : {});
+      })
+      .catch(() => {
+        // Soft-fail: form still works, the server will reject invalid slots.
+      });
+    return () => {
+      cancelled = true;
+    };
+  }, []);
 
   const today = new Date();
   today.setHours(0, 0, 0, 0);
@@ -89,7 +102,6 @@ export default function BookingForm({
     });
   };
 
-  // Calendar navigation
   const prevMonth = () => {
     const now = new Date();
     setCalView((v) => {
@@ -144,7 +156,7 @@ export default function BookingForm({
     let slots: string[] = [];
     if (dow >= 2 && dow <= 5) slots = WEEKDAY_SLOTS;
     else if (dow === 6) slots = SATURDAY_SLOTS;
-    return slots.filter(s => !blocked.includes(s));
+    return slots.filter((s) => !blocked.includes(s));
   };
 
   const goToStep = (n: number) => setStep(n);
@@ -152,48 +164,42 @@ export default function BookingForm({
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     if (!policyAgreed || !selectedService || !selectedDate || !selectedTime) return;
+    setSubmitError(null);
     setSubmitting(true);
+
     try {
-      await fetch('/api/submit-booking', {
+      const res = await fetch('/api/booking/create', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          firstName, lastName, email, phone, notes,
-          service: selectedService.name,
+          firstName,
+          lastName,
+          email,
+          phone,
+          notes,
           serviceId: selectedService.id,
-          addons: selectedAddons.map(a => a.name),
+          addonIds: selectedAddons.map((a) => a.id),
           date: toISO(selectedDate),
           time: selectedTime,
-          total: totalPrice,
-          deposit,
+          policyAgreed,
+          website,
         }),
       });
-    } catch {
-      // Still show confirmation even if save fails (Paulina gets email fallback)
-    }
-    setSubmitting(false);
-    setConfirmed(true);
-    setStep(4);
-  };
 
-  const reset = () => {
-    setStep(1);
-    setSelectedService(null);
-    setSelectedAddons([]);
-    setSelectedDate(null);
-    setSelectedTime(null);
-    setPolicyAgreed(false);
-    setFirstName('');
-    setLastName('');
-    setEmail('');
-    setPhone('');
-    setNotes('');
-    setConfirmed(false);
-    setCalView(() => {
-      const d = new Date();
-      d.setDate(1);
-      return d;
-    });
+      const data = (await res.json().catch(() => null)) as { checkoutUrl?: string; error?: string } | null;
+
+      if (!res.ok || !data?.checkoutUrl) {
+        setSubmitError(data?.error || 'Something went wrong. Please try again.');
+        setSubmitting(false);
+        return;
+      }
+
+      // Redirect to Stripe Checkout. Do NOT show a confirmation — payment isn't done yet.
+      window.location.assign(data.checkoutUrl);
+    } catch {
+      setSubmitError('Network error. Please check your connection and try again.');
+      setSubmitting(false);
+    }
   };
 
   const dateStr = selectedDate
@@ -327,10 +333,9 @@ export default function BookingForm({
       <div className={`booking-step${step === 2 ? ' active' : ''}`}>
         <h3 className="step-title">Pick a time</h3>
         <p className="step-subtitle">
-          Tuesday – Friday evenings and Saturdays. I&apos;ll confirm your slot within a few hours.
+          Tuesday – Friday evenings and Saturdays. Your slot is held the moment your deposit clears.
         </p>
         <div className="datetime-grid">
-          {/* Calendar */}
           <div className="calendar">
             <div className="cal-header">
               <div className="cal-month">
@@ -366,7 +371,6 @@ export default function BookingForm({
             </div>
           </div>
 
-          {/* Time slots */}
           <div>
             <div className="addon-section-title" style={{ marginBottom: 16 }}>
               Available Times
@@ -375,7 +379,7 @@ export default function BookingForm({
               {!selectedDate ? (
                 <p className="time-slots-empty">Select a date to see available times.</p>
               ) : timeSlots().length === 0 ? (
-                <p className="time-slots-empty">Closed on this day.</p>
+                <p className="time-slots-empty">No times available on this day.</p>
               ) : (
                 timeSlots().map((time) => (
                   <button
@@ -410,9 +414,10 @@ export default function BookingForm({
       {/* Step 3: Details */}
       <div className={`booking-step${step === 3 ? ' active' : ''}`}>
         <h3 className="step-title">Your details</h3>
-        <p className="step-subtitle">One last step — we&apos;ll use this to confirm your appointment.</p>
+        <p className="step-subtitle">
+          One last step — we&apos;ll collect your 50% deposit on the next page to lock in your slot.
+        </p>
 
-        {/* Summary */}
         <div className="booking-summary">
           <div className="summary-line">
             <span>{selectedService?.name}</span>
@@ -433,12 +438,29 @@ export default function BookingForm({
             <span className="summary-total summary-total-price">${totalPrice}</span>
           </div>
           <div className="summary-line" style={{ paddingTop: 4, fontSize: 13, color: 'var(--muted)' }}>
-            <span>Deposit due to hold (50%)</span>
+            <span>Deposit due now (50%)</span>
             <span>${deposit}</span>
           </div>
         </div>
 
         <form onSubmit={handleSubmit}>
+          {/* Honeypot — hidden from real users via aria + position. */}
+          <div
+            aria-hidden="true"
+            style={{ position: 'absolute', left: '-9999px', width: 1, height: 1, overflow: 'hidden' }}
+          >
+            <label>
+              Website
+              <input
+                type="text"
+                tabIndex={-1}
+                autoComplete="off"
+                value={website}
+                onChange={(e) => setWebsite(e.target.value)}
+              />
+            </label>
+          </div>
+
           <div className="form-row">
             <div className="form-group">
               <label>First Name</label>
@@ -487,6 +509,23 @@ export default function BookingForm({
             </label>
           </div>
 
+          {submitError && (
+            <div
+              role="alert"
+              style={{
+                background: '#f9e4dc',
+                border: '1px solid #d97757',
+                color: '#7a3818',
+                padding: '12px 16px',
+                borderRadius: 4,
+                margin: '16px 0',
+                fontSize: 14,
+              }}
+            >
+              {submitError}
+            </div>
+          )}
+
           <div className="booking-nav">
             <button type="button" className="booking-btn back" onClick={() => goToStep(2)}>
               Back
@@ -496,132 +535,11 @@ export default function BookingForm({
               className="booking-btn next"
               disabled={!policyAgreed || submitting}
             >
-              {submitting ? 'Sending…' : 'Request Appointment'}
+              {submitting ? 'Redirecting to checkout…' : `Pay $${deposit} deposit & book`}
             </button>
           </div>
         </form>
       </div>
-
-      {/* Step 4: Confirmation */}
-      <div className={`booking-step${step === 4 ? ' active' : ''}`}>
-        <div className="booking-confirmation">
-          <div className="confirmation-icon">
-            <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-              <path d="M5 13l4 4L19 7" />
-            </svg>
-          </div>
-          <h3 className="confirmation-title">
-            Request <em>received.</em>
-          </h3>
-          <p className="confirmation-text">
-            Thank you, {firstName}. I&apos;ll be in touch within a few hours to confirm your
-            appointment on{' '}
-            <em>
-              {dateStr} at {selectedTime}
-            </em>{' '}
-            and send payment instructions for your <strong>${deposit}</strong> deposit. Your
-            spot will be held once the deposit clears.
-          </p>
-
-          <p className="confirmation-text" style={{ marginTop: -4 }}>
-            <strong>First-time client?</strong> Please complete your{' '}
-            <a href="/intake" style={{ color: 'var(--terracotta)', textDecoration: 'underline' }}>
-              intake &amp; consent form
-            </a>{' '}
-            before your appointment.
-          </p>
-
-          {/* Add to Calendar buttons */}
-          <div style={{ display: 'flex', gap: 12, justifyContent: 'center', flexWrap: 'wrap', marginBottom: 20 }}>
-            <button
-              className="booking-btn back"
-              style={{ padding: '12px 20px', fontSize: 11 }}
-              onClick={() => downloadICS()}
-            >
-              🍎 Add to Apple Calendar
-            </button>
-            <a
-              className="booking-btn back"
-              style={{ padding: '12px 20px', fontSize: 11, textDecoration: 'none', display: 'inline-flex', alignItems: 'center' }}
-              href={buildGoogleCalUrl()}
-              target="_blank"
-              rel="noopener noreferrer"
-            >
-              📅 Add to Google Calendar
-            </a>
-          </div>
-
-          <button className="btn-primary" style={{ border: 'none', cursor: 'pointer' }} onClick={reset}>
-            Start Another Booking
-          </button>
-        </div>
-      </div>
     </div>
   );
-
-  // ── Calendar export helpers ──────────────────────────────────────────────
-  function buildEventTimes() {
-    if (!selectedDate || !selectedTime) return { start: '', end: '' };
-
-    // Parse time string like "5:30 PM" or "10:00 AM"
-    const [timePart, meridiem] = selectedTime.split(' ');
-    const [hoursRaw, minutes] = timePart.split(':').map(Number);
-    let hours = hoursRaw;
-    if (meridiem === 'PM' && hours !== 12) hours += 12;
-    if (meridiem === 'AM' && hours === 12) hours = 0;
-
-    const durationMins = selectedService?.duration?.includes('45') ? 45 : 60;
-
-    const start = new Date(selectedDate);
-    start.setHours(hours, minutes, 0, 0);
-    const end = new Date(start.getTime() + durationMins * 60 * 1000);
-
-    const fmt = (d: Date) =>
-      d.toISOString().replace(/[-:]/g, '').split('.')[0] + 'Z';
-
-    return { start: fmt(start), end: fmt(end) };
-  }
-
-  function buildGoogleCalUrl() {
-    const { start, end } = buildEventTimes();
-    if (!start) return '#';
-    const title = encodeURIComponent(`Beautywell Esthetics – ${selectedService?.name ?? 'Appointment'}`);
-    const details = encodeURIComponent(
-      `Your appointment at Beautywell Esthetics in Cypress, CA.\n\nService: ${selectedService?.name}\nTotal: $${totalPrice} (50% deposit: $${deposit})`
-    );
-    return `https://calendar.google.com/calendar/render?action=TEMPLATE&text=${title}&dates=${start}/${end}&details=${details}`;
-  }
-
-  function downloadICS() {
-    const { start, end } = buildEventTimes();
-    if (!start) return;
-    const title = `Beautywell Esthetics – ${selectedService?.name ?? 'Appointment'}`;
-    const description = `Your appointment at Beautywell Esthetics in Cypress, CA.\\nService: ${selectedService?.name}\\nTotal: $${totalPrice} (50% deposit: $${deposit})`;
-    const ics = [
-      'BEGIN:VCALENDAR',
-      'VERSION:2.0',
-      'PRODID:-//Beautywell Esthetics//Booking//EN',
-      'BEGIN:VEVENT',
-      `DTSTART:${start}`,
-      `DTEND:${end}`,
-      `SUMMARY:${title}`,
-      `DESCRIPTION:${description}`,
-      'STATUS:TENTATIVE',
-      'BEGIN:VALARM',
-      'TRIGGER:-PT1H',
-      'ACTION:DISPLAY',
-      'DESCRIPTION:Reminder: Beautywell appointment in 1 hour',
-      'END:VALARM',
-      'END:VEVENT',
-      'END:VCALENDAR',
-    ].join('\r\n');
-
-    const blob = new Blob([ics], { type: 'text/calendar;charset=utf-8' });
-    const url = URL.createObjectURL(blob);
-    const a = document.createElement('a');
-    a.href = url;
-    a.download = 'beautywell-appointment.ics';
-    a.click();
-    URL.revokeObjectURL(url);
-  }
 }

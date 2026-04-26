@@ -12,20 +12,17 @@ function loadContent() {
   const services = readJSON('services.json');
   const addonsData = readJSON('addons.json');
   const settings = readJSON('settings.json');
-  let calendar = { blockedDates: [] as string[], blockedTimes: {} as Record<string, string[]> };
-  try { calendar = readJSON('calendar.json'); } catch {}
 
   return {
     facials: services.facials,
     waxing: services.waxing,
     addons: addonsData.addons,
     settings,
-    calendar,
   };
 }
 
 export default function Home() {
-  const { facials, waxing, addons, settings, calendar } = loadContent();
+  const { facials, waxing, addons, settings } = loadContent();
   const {
     businessName,
     tagline,
@@ -156,8 +153,6 @@ export default function Home() {
             addons={addons}
             depositPolicy={depositPolicy}
             bookingNote={bookingNote}
-            blockedDates={calendar.blockedDates}
-            blockedTimes={calendar.blockedTimes}
           />
         </div>
       </section>
