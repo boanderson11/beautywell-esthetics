@@ -39,3 +39,13 @@ CREATE TABLE IF NOT EXISTS processed_stripe_events (
   event_id    text PRIMARY KEY,
   received_at timestamptz NOT NULL DEFAULT now()
 );
+
+-- Admin users for the DB-backed login at /admin/login.
+-- Seed via `npm run seed:admin` (see scripts/seed-admin.ts).
+CREATE TABLE IF NOT EXISTS admin_users (
+  id              text PRIMARY KEY,
+  email           text NOT NULL UNIQUE,
+  password_hash   text NOT NULL,
+  created_at      timestamptz NOT NULL DEFAULT now(),
+  last_login_at   timestamptz
+);
