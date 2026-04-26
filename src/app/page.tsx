@@ -95,7 +95,9 @@ export default async function Home() {
             <div className="image-block main">
               <div className="about-initial">B</div>
             </div>
-            <div className="image-block sub" />
+            <div className="image-block sub">
+              <img src="/about-facial.jpg" alt="Esthetician applying a facial mask with a fan brush" />
+            </div>
           </div>
           <div className="about-content reveal">
             <div className="section-label">The Studio</div>
