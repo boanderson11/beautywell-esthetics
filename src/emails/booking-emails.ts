@@ -1,6 +1,7 @@
 // Plain HTML email templates. Kept dependency-free so the webhook stays fast.
 
 import { formatDate, formatMoney } from '@/lib/booking-format';
+import { env } from '@/lib/env';
 
 export type BookingEmailData = {
   id: string;
@@ -83,7 +84,7 @@ export function customerEmail(data: BookingEmailData): { subject: string; html: 
         </p>
       </div>
 
-      <p><strong>First-time client?</strong> Please complete your <a href="https://beautywell.com/intake" style="color:#6b4423;">intake & consent form</a> before your appointment.</p>
+      <p><strong>First-time client?</strong> Please complete your <a href="${env.SITE_URL}/intake" style="color:#6b4423;">intake & consent form</a> before your appointment.</p>
 
       <p style="font-size:13px; color:#7a7268; margin-top:32px;">
         <strong>Cancellation policy:</strong> Your deposit is non-refundable if you cancel within 48 hours of your appointment.
@@ -110,7 +111,7 @@ export function customerEmail(data: BookingEmailData): { subject: string; html: 
     `Deposit paid: ${formatMoney(data.depositCents)}`,
     `Balance due at appointment: ${formatMoney(balanceCents)}`,
     '',
-    'First-time? Please complete your intake form: https://beautywell.com/intake',
+    `First-time? Please complete your intake form: ${env.SITE_URL}/intake`,
     '',
     `Booking reference: ${data.id}`,
   ].join('\n');
