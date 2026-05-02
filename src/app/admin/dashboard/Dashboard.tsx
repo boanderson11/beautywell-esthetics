@@ -153,8 +153,13 @@ export default function Dashboard({ adminEmail }: { adminEmail: string }) {
           <div style={{ textAlign: 'center', padding: '60px 0', color: '#7a7268', fontSize: '14px' }}>Loading…</div>
         )}
 
-        {!loading && tab === 'bookings' && bookings && (
-          <BookingsTab bookings={bookings} reload={reload} />
+        {!loading && tab === 'bookings' && bookings && services && addons && (
+          <BookingsTab
+            bookings={bookings}
+            services={services}
+            addons={addons}
+            reload={reload}
+          />
         )}
 
         {!loading && tab === 'pricing' && services && (

@@ -13,6 +13,7 @@ type BookingRow = {
   last_name: string;
   email: string;
   phone: string;
+  service_id: string;
   service_name: string;
   addons: Array<{ id: string; name: string; price: number }>;
   date: string;
@@ -22,6 +23,7 @@ type BookingRow = {
   notes: string | null;
   paid_at: string | null;
   intake_completed_at: string | null;
+  prep_completed_at: string | null;
 };
 
 export async function GET() {
@@ -33,8 +35,9 @@ export async function GET() {
   const rows = (await sql`
     SELECT
       id, status, created_at, first_name, last_name, email, phone,
-      service_name, addons, date::text AS date, time_slot,
-      total_cents, deposit_cents, notes, paid_at, intake_completed_at
+      service_id, service_name, addons, date::text AS date, time_slot,
+      total_cents, deposit_cents, notes, paid_at, intake_completed_at,
+      prep_completed_at
     FROM bookings
     ORDER BY date DESC, time_slot DESC, created_at DESC
     LIMIT 500

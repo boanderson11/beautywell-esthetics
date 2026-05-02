@@ -34,6 +34,7 @@ ALTER TABLE bookings ADD COLUMN IF NOT EXISTS reminder_sent_at        timestampt
 ALTER TABLE bookings ADD COLUMN IF NOT EXISTS intake_reminder_sent_at timestamptz;
 ALTER TABLE bookings ADD COLUMN IF NOT EXISTS intake_completed_at     timestamptz;
 ALTER TABLE bookings ADD COLUMN IF NOT EXISTS intake_id               text;
+ALTER TABLE bookings ADD COLUMN IF NOT EXISTS prep_completed_at       timestamptz;
 
 -- Foolproof: only one active booking per (date, time_slot).
 -- An "active" booking is either awaiting payment or already paid.
