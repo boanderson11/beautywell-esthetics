@@ -19,16 +19,22 @@
 //
 // Idempotency
 // -----------
-// The migration is gated on conservative data-shape signals so it is safe to
-// run on every Netlify deploy:
+// Two layers of gating, so subsequent deploys can never re-fire and clobber
+// later admin-dashboard edits:
 //
-//   - Services payload: only migrates if `timeless` still exists in
-//     `services.facials`. Once renamed, subsequent runs are no-ops.
-//   - Addons payload: only migrates if `collagen` is missing from
-//     `addons.addons`. Once added, subsequent runs are no-ops.
+//   1. `applied_migrations` table (primary). On first successful run, this
+//      script inserts a row keyed by MIGRATION_NAME. Every subsequent invocation
+//      checks for that row up front and exits early if present — regardless of
+//      what the content payload currently looks like. So even if Paulina later
+//      re-creates an `id: timeless` service or deletes the `collagen` add-on,
+//      the migration stays a no-op.
 //
-// This means the migration runs at most once and never overwrites later
-// admin-dashboard edits on top of the migrated state.
+//   2. Per-payload data-shape signals (defence-in-depth). The services step
+//      no-ops if `timeless` is absent; the addons step no-ops if `collagen` is
+//      already present. These also handle partial failures during the very
+//      first run (e.g., services succeeded but the script crashed before
+//      addons): on retry the services step skips while the addons step still
+//      runs, and both completing is what triggers the applied_migrations write.
 //
 // Run standalone via `npm run apply-paulina-updates` (requires DATABASE_URL).
 // Hooked into `scripts/build-setup.ts` so the next Netlify deploy applies it
@@ -37,6 +43,8 @@
 import { Pool } from '@neondatabase/serverless';
 import fs from 'node:fs';
 import path from 'node:path';
+
+const MIGRATION_NAME = 'paulina-updates-2026-05';
 
 type Facial = {
   id: string;
@@ -83,8 +91,50 @@ const COLLAGEN_ADDON: Addon = {
   name: 'Collagen Mask',
   price: 25,
   description:
-    'Hydrating collagen mask for deep hydration, plumping, and a glass-skin finish.',
+    'Bio-cellulose collagen mask for plumping, deep hydration, and a glass-skin finish.',
 };
+
+// Self-create the table so this script also works when invoked standalone via
+// `npm run apply-paulina-updates`, where the schema migration step has not run
+// in the same process. In the build-setup path, schema.sql already created it.
+async function ensureMigrationsTable(pool: Pool): Promise<void> {
+  const client = await pool.connect();
+  try {
+    await client.query(
+      `CREATE TABLE IF NOT EXISTS applied_migrations (
+         name        text PRIMARY KEY,
+         applied_at  timestamptz NOT NULL DEFAULT now()
+       )`,
+    );
+  } finally {
+    client.release();
+  }
+}
+
+async function isMigrationApplied(pool: Pool): Promise<boolean> {
+  const client = await pool.connect();
+  try {
+    const result = await client.query(
+      'SELECT 1 FROM applied_migrations WHERE name = $1 LIMIT 1',
+      [MIGRATION_NAME],
+    );
+    return result.rows.length > 0;
+  } finally {
+    client.release();
+  }
+}
+
+async function markMigrationApplied(pool: Pool): Promise<void> {
+  const client = await pool.connect();
+  try {
+    await client.query(
+      'INSERT INTO applied_migrations (name) VALUES ($1) ON CONFLICT DO NOTHING',
+      [MIGRATION_NAME],
+    );
+  } finally {
+    client.release();
+  }
+}
 
 async function loadFromDbOrFile<T>(
   pool: Pool,
@@ -224,6 +274,14 @@ export async function applyPaulinaUpdates2026May(
   const ownsPool = !externalPool;
 
   try {
+    await ensureMigrationsTable(pool);
+    if (await isMigrationApplied(pool)) {
+      console.log(
+        `[paulina-updates-2026-05] already applied — skipping (applied_migrations row present).`,
+      );
+      return;
+    }
+
     // Services
     const servicesLoad = await loadFromDbOrFile<ServicesPayload>(
       pool,
@@ -259,6 +317,13 @@ export async function applyPaulinaUpdates2026May(
         `[paulina-updates-2026-05] addons unchanged — ${addonsResult.note}`,
       );
     }
+
+    // Mark applied only after both steps completed (whether by mutation or
+    // by being already in the target shape). If an exception was thrown
+    // mid-way, this line is skipped and the next run picks up where it
+    // stopped via the per-payload data-shape signals.
+    await markMigrationApplied(pool);
+    console.log(`[paulina-updates-2026-05] ✓ recorded in applied_migrations`);
   } finally {
     if (ownsPool) await pool.end();
   }
