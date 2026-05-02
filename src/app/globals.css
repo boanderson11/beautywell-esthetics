@@ -1451,3 +1451,385 @@ footer .logo em { color: var(--terracotta-soft); }
   .hero h1 { font-size: 38px; }
   .section-title { font-size: 32px; }
 }
+
+/* ============ PREP SHEET (back-of-house) ============ */
+.prep-page {
+  min-height: 100vh;
+  background: #f5f2ec;
+  padding: 16px 16px 64px;
+}
+.prep-container {
+  max-width: 600px;
+  margin: 0 auto;
+}
+.prep-header {
+  position: relative;
+  padding: 24px 0 16px;
+}
+.prep-eyebrow {
+  font-size: 9px;
+  letter-spacing: 4px;
+  text-transform: uppercase;
+  color: var(--terracotta);
+  font-weight: 500;
+}
+.prep-title {
+  font-family: 'Cormorant Garamond', serif;
+  font-style: italic;
+  font-weight: 400;
+  font-size: 32px;
+  color: var(--earth-soft);
+  margin-top: 4px;
+  line-height: 1.1;
+}
+.prep-title em {
+  font-style: italic;
+  color: var(--sage-deep);
+}
+.prep-back-link {
+  position: absolute;
+  top: 28px;
+  right: 0;
+  font-size: 11px;
+  letter-spacing: 1.5px;
+  text-transform: uppercase;
+  color: var(--sage-deep);
+  text-decoration: none;
+  padding: 8px 14px;
+  border: 1px solid var(--sage-mist);
+  border-radius: 3px;
+  background: #fff;
+}
+.prep-back-link:hover { background: var(--sage-wash); }
+
+.prep-card {
+  background: #fff;
+  border: 1px solid var(--sage-mist);
+  border-radius: 10px;
+  padding: 16px;
+  margin-bottom: 12px;
+}
+.prep-empty { text-align: center; }
+.prep-empty h2 {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 24px;
+  color: var(--earth-soft);
+  margin-bottom: 8px;
+}
+.prep-empty p {
+  font-size: 14px;
+  color: var(--muted);
+  margin-bottom: 16px;
+}
+
+.prep-loading {
+  font-size: 14px;
+  color: var(--muted);
+  text-align: center;
+  padding: 48px 16px;
+}
+
+.prep-client-banner { padding: 18px; }
+.prep-client-name {
+  font-family: 'Cormorant Garamond', serif;
+  font-style: italic;
+  font-size: 26px;
+  color: var(--earth-soft);
+  line-height: 1.2;
+}
+.prep-client-service {
+  font-size: 13px;
+  color: var(--terracotta);
+  margin-top: 4px;
+}
+.prep-client-addons {
+  color: var(--muted);
+  font-size: 12px;
+}
+.prep-client-meta {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-top: 10px;
+  font-size: 12px;
+  color: var(--muted);
+}
+.prep-client-price {
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  font-weight: 600;
+  font-size: 18px;
+  color: var(--terracotta);
+}
+.prep-client-notes {
+  margin-top: 10px;
+  padding: 10px 12px;
+  background: var(--cream);
+  border-radius: 4px;
+  font-size: 12px;
+  font-style: italic;
+  color: var(--muted);
+}
+.prep-manual-badge {
+  display: inline-block;
+  margin-top: 8px;
+  padding: 3px 10px;
+  border-radius: 20px;
+  background: var(--cream-warm);
+  color: var(--clay);
+  font-size: 10px;
+  letter-spacing: 1.5px;
+  text-transform: uppercase;
+  font-weight: 600;
+}
+
+/* Progress bar */
+.prep-progress {
+  padding: 14px 16px;
+  background: #fff;
+  border: 1px solid var(--sage-mist);
+  border-radius: 10px;
+  margin-bottom: 12px;
+}
+.prep-progress-track {
+  height: 4px;
+  background: var(--sage-mist);
+  border-radius: 2px;
+  overflow: hidden;
+}
+.prep-progress-fill {
+  height: 100%;
+  background: linear-gradient(90deg, var(--sage-light), var(--sage-deep));
+  transition: width 200ms ease;
+}
+.prep-progress-meta {
+  margin-top: 8px;
+  font-size: 12px;
+  letter-spacing: 1.5px;
+  text-transform: uppercase;
+  color: var(--muted);
+  font-weight: 500;
+}
+.prep-ready-badge {
+  display: inline-block;
+  background: #5A7A52;
+  color: var(--bone);
+  padding: 4px 12px;
+  border-radius: 20px;
+  font-size: 11px;
+  font-weight: 600;
+}
+
+/* Section card */
+.prep-section { padding: 0; overflow: hidden; transition: opacity 200ms; }
+.prep-section-done { opacity: 0.65; }
+.prep-section-header {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 14px 16px;
+  background: none;
+  border: none;
+  cursor: pointer;
+  font-family: inherit;
+  text-align: left;
+  border-bottom: 1px solid var(--sage-mist);
+}
+.prep-section-icon { font-size: 18px; }
+.prep-section-title {
+  flex: 1;
+  font-size: 12px;
+  letter-spacing: 1.5px;
+  text-transform: uppercase;
+  color: var(--earth-soft);
+  font-weight: 600;
+}
+.prep-section-count {
+  font-size: 11px;
+  color: var(--muted);
+  font-variant-numeric: tabular-nums;
+}
+.prep-section-chevron { font-size: 12px; color: var(--muted); }
+
+.prep-check-list { list-style: none; padding: 6px 0; margin: 0; }
+.prep-check-list li { margin: 0; }
+
+.prep-check-item {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 10px 16px;
+  background: none;
+  border: none;
+  cursor: pointer;
+  font-family: inherit;
+  text-align: left;
+  min-height: 44px;
+  border-radius: 0;
+}
+.prep-check-item:hover { background: var(--sage-wash); }
+.prep-check-item-done .prep-check-label {
+  text-decoration: line-through;
+  color: var(--muted);
+}
+
+.prep-check-box {
+  width: 20px;
+  height: 20px;
+  flex-shrink: 0;
+  border: 1.5px solid var(--sage-mist);
+  border-radius: 4px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--bone);
+  background: #fff;
+}
+.prep-check-box-on {
+  background: #5A7A52;
+  border-color: #5A7A52;
+}
+.prep-check-label {
+  flex: 1;
+  font-size: 14px;
+  color: var(--ink);
+}
+
+/* Brand badges */
+.prep-brand-badge {
+  flex-shrink: 0;
+  padding: 2px 8px;
+  border-radius: 12px;
+  font-size: 10px;
+  font-weight: 600;
+  letter-spacing: 0.5px;
+  white-space: nowrap;
+}
+.prep-brand-dermalogica { background: #ebebeb; color: #555; }
+.prep-brand-image       { background: #f5ede4; color: #9c6644; }
+.prep-brand-esthemax    { background: #faf0e6; color: #c4956a; }
+.prep-brand-biodance    { background: #e5f0ee; color: #4a8a7a; }
+.prep-brand-cosdebaha   { background: #ede5f0; color: #7a5a8f; }
+.prep-brand-laneige     { background: #e5eef5; color: #4a7a9c; }
+.prep-brand-generic     { display: none; }
+
+.prep-qty-badge {
+  flex-shrink: 0;
+  padding: 2px 8px;
+  border-radius: 12px;
+  background: var(--cream);
+  color: var(--muted);
+  font-size: 10px;
+  font-weight: 500;
+  font-variant-numeric: tabular-nums;
+}
+
+/* Treatment protocol */
+.prep-protocol { padding: 18px; }
+.prep-protocol-title {
+  font-size: 12px;
+  letter-spacing: 1.5px;
+  text-transform: uppercase;
+  color: var(--terracotta);
+  font-weight: 600;
+  margin-bottom: 12px;
+}
+.prep-protocol-steps {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+.prep-protocol-steps li {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+.prep-protocol-num {
+  flex-shrink: 0;
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+  background: var(--sage-wash);
+  color: var(--sage-deep);
+  font-size: 11px;
+  font-weight: 600;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.prep-protocol-text {
+  font-family: 'Cormorant Garamond', serif;
+  font-style: italic;
+  font-size: 14px;
+  color: var(--earth-soft);
+}
+
+/* Actions */
+.prep-actions {
+  margin-top: 16px;
+  display: flex;
+  gap: 10px;
+  justify-content: center;
+}
+.prep-btn {
+  padding: 12px 22px;
+  border-radius: 4px;
+  font-size: 11px;
+  letter-spacing: 1.5px;
+  text-transform: uppercase;
+  font-weight: 600;
+  cursor: pointer;
+  font-family: inherit;
+  border: 1px solid transparent;
+  text-decoration: none;
+  display: inline-block;
+}
+.prep-btn-primary {
+  background: var(--sage-deep);
+  color: var(--bone);
+  border-color: var(--sage-deep);
+}
+.prep-btn-primary:hover { background: var(--sage); }
+.prep-btn-primary:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+.prep-error {
+  margin: 12px 0;
+  padding: 10px 14px;
+  background: #fde8e8;
+  color: #7a2020;
+  border-radius: 4px;
+  font-size: 12px;
+}
+
+/* "Prepped" indicator inside dashboard booking cards */
+.prep-prepped-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 3px 10px;
+  border-radius: 20px;
+  background: #e8f0e3;
+  color: #5A7A52;
+  font-size: 10px;
+  letter-spacing: 1.5px;
+  text-transform: uppercase;
+  font-weight: 600;
+}
+
+@media (max-width: 480px) {
+  .prep-back-link {
+    position: static;
+    display: inline-block;
+    margin-top: 12px;
+  }
+  .prep-title { font-size: 28px; }
+  .prep-client-name { font-size: 22px; }
+}

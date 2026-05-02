@@ -32,6 +32,7 @@ export type Booking = {
   last_name: string;
   email: string;
   phone: string;
+  service_id: string;
   service_name: string;
   addons: Array<{ id: string; name: string; price: number }>;
   date: string;
@@ -41,4 +42,5 @@ export type Booking = {
   notes: string | null;
   paid_at: string | null;
   intake_completed_at: string | null;
+  prep_completed_at: string | null;
 };
