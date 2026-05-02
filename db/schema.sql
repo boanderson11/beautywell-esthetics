@@ -71,3 +71,12 @@ CREATE TABLE IF NOT EXISTS content_blocks (
   value       jsonb NOT NULL,
   updated_at  timestamptz NOT NULL DEFAULT now()
 );
+
+-- One-off content/data migrations are recorded here by name so they run
+-- exactly once per database. Migration scripts in scripts/migrations/ check
+-- this table at the top and exit early if their name is already present, so
+-- subsequent deploys never re-apply (and never clobber later admin edits).
+CREATE TABLE IF NOT EXISTS applied_migrations (
+  name        text PRIMARY KEY,
+  applied_at  timestamptz NOT NULL DEFAULT now()
+);

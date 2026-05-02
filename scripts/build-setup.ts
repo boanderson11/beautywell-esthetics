@@ -2,6 +2,10 @@
 // Designed for the Netlify build: the user sets env vars in the Netlify UI, the
 // next deploy picks them up automatically, and signing in at /admin/login works.
 //
+// Also runs one-off content migrations (see scripts/migrations/) on every
+// deploy. Each content migration is internally idempotent — gated on data-shape
+// signals so it only mutates the DB once.
+//
 // Gated on env vars: missing config logs a notice and exits 0 so the build still
 // succeeds on a fresh deploy where DB / admin envs are not yet configured.
 
@@ -10,6 +14,8 @@ import { randomBytes, scrypt as scryptCb } from 'node:crypto';
 import { promisify } from 'node:util';
 import fs from 'node:fs';
 import path from 'node:path';
+
+import { applyPaulinaUpdates2026May } from './migrations/paulina-updates-2026-05';
 
 const scrypt = promisify(scryptCb) as (
   password: string,
@@ -77,6 +83,17 @@ async function seedAdmin(pool: Pool, rawEmail: string, password: string): Promis
   }
 }
 
+async function runContentMigrations(pool: Pool): Promise<void> {
+  // Each content migration is wrapped in its own try/catch so a single failure
+  // does not block subsequent migrations or the rest of the build. Migrations
+  // are idempotent — they self-skip once their target state is detected.
+  try {
+    await applyPaulinaUpdates2026May(pool);
+  } catch (err) {
+    console.error('[build-setup] ! content migration paulina-updates-2026-05 failed (continuing):', err);
+  }
+}
+
 async function main() {
   const dbUrl = process.env.DATABASE_URL;
   if (!dbUrl) {
@@ -95,6 +112,8 @@ async function main() {
     } else {
       console.log('[build-setup] ADMIN_INITIAL_EMAIL or ADMIN_INITIAL_PASSWORD not set — skipping admin seed.');
     }
+
+    await runContentMigrations(pool);
   } finally {
     await pool.end();
   }

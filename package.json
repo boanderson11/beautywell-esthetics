@@ -8,7 +8,8 @@
     "start": "next start",
     "lint": "next lint",
     "migrate": "tsx scripts/migrate.ts",
-    "seed:admin": "tsx scripts/seed-admin.ts"
+    "seed:admin": "tsx scripts/seed-admin.ts",
+    "apply-paulina-updates": "tsx scripts/migrations/paulina-updates-2026-05.ts"
   },
   "dependencies": {
     "@neondatabase/serverless": "^0.9.5",

@@ -6,7 +6,7 @@
       "tag": "Most Popular",
       "duration": "60 Minutes",
       "price": 125,
-      "description": "A fully customized facial tailored to your skin's needs. Double cleanse, enzyme exfoliation, steam, extractions, custom mask, and finishing serums with device-assisted infusion for deep product penetration.",
+      "description": "A fully customized facial tailored to your skin's needs. Double cleanse, exfoliation, extractions, facial massage, custom mask, and finishing serums — every step selected specifically for your skin type.",
       "benefits": ["Deep Cleansing", "Customized", "Instant Glow"]
     },
     {
@@ -15,26 +15,17 @@
       "tag": "Best Seller",
       "duration": "60 Minutes",
       "price": 165,
-      "description": "An intensely hydrating treatment using hyaluronic layering and device-assisted infusion to drive active ingredients deep into the skin. Finished with a collagen bio-cellulose mask for plumped, dewy results.",
+      "description": "An intensely hydrating treatment using multi-layer hyaluronic application and a collagen mask for plumped, dewy, glass-skin results. The hero step: three layers of hyaluronic acid on freshly treated skin.",
       "benefits": ["Deep Hydration", "Plumping", "Barrier Repair"]
     },
     {
-      "id": "timeless",
-      "name": "Timeless Renewal",
+      "id": "liquidfacelift",
+      "name": "The Liquid Facelift",
       "tag": "Premium",
       "duration": "60 Minutes",
       "price": 195,
-      "description": "Our most luxurious anti-aging ritual. Microcurrent therapy sculpts and lifts facial contours while peptide serums are infused deep into the skin. Finished with a firming mask for visibly tighter, radiant skin.",
-      "benefits": ["Fine Line Reduction", "Lifted Contours", "Luminous"]
-    },
-    {
-      "id": "peel",
-      "name": "Brilliance Peel",
-      "tag": "Results-Driven",
-      "duration": "45 Minutes",
-      "price": 145,
-      "description": "A professional-grade chemical peel using a customized blend of AHAs, BHAs, and botanical brighteners. Targets hyperpigmentation, texture, acne scarring, and uneven tone with visible results after one session.",
-      "benefits": ["Resurfaced Texture", "Even Tone", "Cell Turnover"]
+      "description": "Our most luxurious anti-aging treatment. Microcurrent therapy sculpts and lifts facial contours while peptide and vitamin C serums restore firmness and radiance. Finished with a collagen mask for visibly tighter, glowing skin.",
+      "benefits": ["Fine Line Reduction", "Sculpted Contours", "Luminous"]
     },
     {
       "id": "lumin",
