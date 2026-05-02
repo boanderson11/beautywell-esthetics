@@ -9,32 +9,38 @@
     {
       "id": "nuface",
       "name": "Microcurrent Sculpt",
-      "price": 35,
+      "price": 30,
       "description": "Microcurrent lifting and contouring — instant jawline definition and cheek lift."
     },
     {
       "id": "led",
       "name": "LED Light Boost",
-      "price": 30,
+      "price": 25,
       "description": "LED mask therapy added to any facial for collagen stimulation and calming."
     },
     {
       "id": "guasha",
       "name": "Gua Sha Lymphatic",
-      "price": 30,
+      "price": 25,
       "description": "Stone massage to sculpt, de-puff, and encourage circulation and lymphatic flow."
     },
     {
       "id": "serum",
       "name": "Deep Serum Infusion",
-      "price": 25,
+      "price": 20,
       "description": "Device-assisted serum delivery for maximum product absorption and visible results."
     },
     {
       "id": "eye",
       "name": "Eye Rescue",
-      "price": 20,
+      "price": 25,
       "description": "Hydrogel under-eye patches with cooling massage to brighten and de-puff."
+    },
+    {
+      "id": "collagen",
+      "name": "Collagen Mask",
+      "price": 25,
+      "description": "Hydrating collagen mask for deep hydration, plumping, and a glass-skin finish."
     },
     {
       "id": "lip",
