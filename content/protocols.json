@@ -1,0 +1,45 @@
+{
+  "protocols": {
+    "signature": [
+      { "id": "sig-1", "action": "First cleanse", "productIds": ["p-precleanse"], "combinator": "+", "suffix": "" },
+      { "id": "sig-2", "action": "Second cleanse", "productIds": ["p-special-cleansing-gel"], "combinator": "+", "suffix": "" },
+      { "id": "sig-3", "action": "Exfoliation", "productIds": ["p-daily-microfoliant", "p-exfoliant-accelerator"], "combinator": "or", "suffix": "" },
+      { "id": "sig-4", "action": "Extractions under mag lamp", "productIds": [], "combinator": "+", "suffix": "" },
+      { "id": "sig-5", "action": "", "productIds": ["p-post-extraction-solution"], "combinator": "+", "suffix": "" },
+      { "id": "sig-6", "action": "Massage", "productIds": ["p-pro-massage-gel-cream"], "combinator": "+", "suffix": "" },
+      { "id": "sig-7", "action": "Mask", "productIds": ["p-hydrojelly-ha", "p-hydrojelly-vitc"], "combinator": "or", "suffix": "(10–15 min)" },
+      { "id": "sig-8", "action": "Tone", "productIds": ["p-pro-multi-active-toner"], "combinator": "+", "suffix": "" },
+      { "id": "sig-9", "action": "Serum", "productIds": ["p-biolumin-c-serum"], "combinator": "+", "suffix": "" },
+      { "id": "sig-10", "action": "Finish", "productIds": ["p-active-moist", "p-physical-defense-spf30"], "combinator": "+", "suffix": "" }
+    ],
+    "hydralux": [
+      { "id": "hyd-1", "action": "First cleanse", "productIds": ["p-precleanse"], "combinator": "+", "suffix": "" },
+      { "id": "hyd-2", "action": "Second cleanse", "productIds": ["p-intensive-moisture-cleanser"], "combinator": "+", "suffix": "" },
+      { "id": "hyd-3", "action": "Light exfoliation", "productIds": ["p-multi-active-scaling-gel"], "combinator": "+", "suffix": "" },
+      { "id": "hyd-4", "action": "Mask", "productIds": ["p-biocellulose-sheet", "p-hydrojelly-ha"], "combinator": "or", "suffix": "(10–15 min)" },
+      { "id": "hyd-5", "action": "Tone", "productIds": ["p-pro-multi-active-toner"], "combinator": "+", "suffix": "" },
+      { "id": "hyd-6", "action": "HA Layering — 3 layers on damp skin", "productIds": [], "combinator": "+", "suffix": "" },
+      { "id": "hyd-7", "action": "Finish", "productIds": ["p-skin-smoothing-cream", "p-physical-defense-spf30"], "combinator": "+", "suffix": "" }
+    ],
+    "liquidfacelift": [
+      { "id": "lf-1", "action": "First cleanse", "productIds": ["p-vital-c-cleanser"], "combinator": "+", "suffix": "" },
+      { "id": "lf-2", "action": "Second cleanse", "productIds": ["p-ormedic-cleanser"], "combinator": "+", "suffix": "" },
+      { "id": "lf-3", "action": "Conductive medium", "productIds": ["p-pro-conductive-masque"], "combinator": "+", "suffix": "" },
+      { "id": "lf-4", "action": "Mask", "productIds": ["p-biodance-collagen"], "combinator": "+", "suffix": "" },
+      { "id": "lf-5", "action": "Tone", "productIds": ["p-ormedic-balancing-serum"], "combinator": "+", "suffix": "" },
+      { "id": "lf-6", "action": "Peptide infusion", "productIds": ["p-max-stem-cell-serum"], "combinator": "+", "suffix": "" },
+      { "id": "lf-7", "action": "Microcurrent sculpting — NuFace", "productIds": [], "combinator": "+", "suffix": "" },
+      { "id": "lf-8", "action": "Vitamin C", "productIds": ["p-vital-c-ace-serum"], "combinator": "+", "suffix": "" },
+      { "id": "lf-9", "action": "Finish", "productIds": ["p-vital-c-facial-oil", "p-max-stem-cell-creme", "p-daily-prevention-spf50"], "combinator": "+", "suffix": "" }
+    ],
+    "lumin": [
+      { "id": "lum-1", "action": "First cleanse", "productIds": ["p-precleanse"], "combinator": "+", "suffix": "" },
+      { "id": "lum-2", "action": "Second cleanse", "productIds": ["p-special-cleansing-gel"], "combinator": "+", "suffix": "" },
+      { "id": "lum-3", "action": "Enzyme", "productIds": ["p-multivitamin-thermafoliant", "p-calming-botanical-mixer"], "combinator": "+", "suffix": "" },
+      { "id": "lum-4", "action": "Tone", "productIds": ["p-pro-multi-active-toner"], "combinator": "+", "suffix": "" },
+      { "id": "lum-5", "action": "Serum", "productIds": ["p-circular-hydration-serum"], "combinator": "+", "suffix": "" },
+      { "id": "lum-6", "action": "LED mask session", "productIds": [], "combinator": "+", "suffix": "(15–20 min)" },
+      { "id": "lum-7", "action": "Finish", "productIds": ["p-active-moist", "p-physical-defense-spf30"], "combinator": "+", "suffix": "" }
+    ]
+  }
+}
