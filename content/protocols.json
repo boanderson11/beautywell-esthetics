@@ -40,6 +40,19 @@
       { "id": "lum-5", "action": "Serum", "productIds": ["p-circular-hydration-serum"], "combinator": "+", "suffix": "" },
       { "id": "lum-6", "action": "LED mask session", "productIds": [], "combinator": "+", "suffix": "(15–20 min)" },
       { "id": "lum-7", "action": "Finish", "productIds": ["p-active-moist", "p-physical-defense-spf30"], "combinator": "+", "suffix": "" }
-    ]
+    ],
+
+    "wax-lip": [],
+    "wax-brow": [],
+    "wax-combo": [],
+
+    "dermaplaning": [],
+    "nuface": [],
+    "led": [],
+    "guasha": [],
+    "serum": [],
+    "eye": [],
+    "lip": [],
+    "collagen": []
   }
 }
