@@ -221,6 +221,19 @@ export default function PrepView({
     [booking, protocols],
   );
 
+  // Add-ons can have their own protocols too. Only surface ones with at least
+  // one step — empty arrays mean Paulina hasn't defined a workflow for that
+  // add-on yet.
+  const addonProtocols = useMemo(() => {
+    if (!booking) return [] as Array<{ name: string; steps: ProtocolStep[] }>;
+    const result: Array<{ name: string; steps: ProtocolStep[] }> = [];
+    for (const a of booking.addons) {
+      const steps = protocolFor(protocols, a.id);
+      if (steps && steps.length > 0) result.push({ name: a.name, steps });
+    }
+    return result;
+  }, [booking, protocols]);
+
   const totalItems = sections.reduce((s, sec) => s + sec.items.length, 0);
   const checkedCount = sections.reduce(
     (s, sec) => s + sec.items.filter((i) => checked[i.id]).length,
@@ -370,7 +383,7 @@ export default function PrepView({
           ),
         )}
 
-        {/* Treatment protocol */}
+        {/* Main treatment protocol */}
         {protocol && (
           <div className="prep-card prep-protocol">
             <div className="prep-protocol-title">Treatment Order</div>
@@ -384,6 +397,21 @@ export default function PrepView({
             </ol>
           </div>
         )}
+
+        {/* Per-add-on protocols — only shown when the add-on has steps defined */}
+        {addonProtocols.map((p, i) => (
+          <div key={i} className="prep-card prep-protocol">
+            <div className="prep-protocol-title">{p.name} · Add-on Workflow</div>
+            <ol className="prep-protocol-steps">
+              {p.steps.map((step, idx) => (
+                <li key={step.id}>
+                  <span className="prep-protocol-num">{idx + 1}</span>
+                  <span className="prep-protocol-text">{renderStep(step, productsById)}</span>
+                </li>
+              ))}
+            </ol>
+          </div>
+        ))}
 
         {/* Mark complete */}
         {markErr && <div className="prep-error">{markErr}</div>}

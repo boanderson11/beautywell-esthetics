@@ -277,10 +277,11 @@ export function selectItems<T extends { triggers: Trigger[] }>(
 
 export function protocolFor(
   protocols: Record<string, ProtocolStep[]>,
-  serviceId: string,
+  serviceOrAddonId: string,
 ): ProtocolStep[] | null {
-  if (!isFacial(serviceId)) return null;
-  return protocols[serviceId] ?? null;
+  const steps = protocols[serviceOrAddonId];
+  if (!steps || steps.length === 0) return null;
+  return steps;
 }
 
 // Render a structured step into a single display string. Products are looked

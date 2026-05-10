@@ -7,20 +7,16 @@ import type { ServicesData, AddonsData, Settings, CalendarData, Booking } from '
 import type { Product, ProtocolStep, ProductsPayload, ProtocolsPayload } from '@/lib/prep-mapping'
 import { loadContent, saveContent, loadBookings } from './api-client'
 
-import PricingTab from './PricingTab'
-import AddonsTab from './AddonsTab'
+import ServicesTab from './ServicesTab'
 import SettingsTab from './SettingsTab'
 import CalendarTab from './CalendarTab'
 import BookingsTab from './BookingsTab'
 import AdminsTab from './AdminsTab'
 import ProductsTab from './ProductsTab'
-import ProtocolsTab from './ProtocolsTab'
 
 type TabKey =
   | 'bookings'
-  | 'pricing'
-  | 'addons'
-  | 'protocols'
+  | 'services'
   | 'products'
   | 'settings'
   | 'calendar'
@@ -72,26 +68,6 @@ export default function Dashboard({ adminEmail }: { adminEmail: string }) {
     router.refresh()
   }
 
-  async function savePricing() {
-    if (!services) return
-    setSaving(true); setSaveMsg('')
-    try {
-      await saveContent('services', services)
-      setSaveMsg('✓ Saved')
-    } catch { setSaveMsg('Save failed. Please try again.') }
-    setSaving(false)
-  }
-
-  async function saveAddons() {
-    if (!addons) return
-    setSaving(true); setSaveMsg('')
-    try {
-      await saveContent('addons', addons)
-      setSaveMsg('✓ Saved')
-    } catch { setSaveMsg('Save failed. Please try again.') }
-    setSaving(false)
-  }
-
   async function saveSettings() {
     if (!settings) return
     setSaving(true); setSaveMsg('')
@@ -122,13 +98,23 @@ export default function Dashboard({ adminEmail }: { adminEmail: string }) {
     setSaving(false)
   }
 
-  async function saveProtocols() {
-    if (!protocols) return
+  // Services tab save: persists services + addons + protocols + products in
+  // one click since they're typically edited together (e.g. add a facial,
+  // open its protocol, create a new product mid-step).
+  async function saveServicesTab() {
+    if (!services || !addons || !protocols || !products) return
     setSaving(true); setSaveMsg('')
     try {
-      await saveContent('protocols', { protocols })
+      await Promise.all([
+        saveContent('services', services),
+        saveContent('addons', addons),
+        saveContent('protocols', { protocols }),
+        saveContent('products', { products }),
+      ])
       setSaveMsg('✓ Saved')
-    } catch { setSaveMsg('Save failed. Please try again.') }
+    } catch {
+      setSaveMsg('Save failed. Please try again.')
+    }
     setSaving(false)
   }
 
@@ -136,14 +122,12 @@ export default function Dashboard({ adminEmail }: { adminEmail: string }) {
   useEffect(() => { setSaveMsg('') }, [tab])
 
   const TABS: Array<{ key: TabKey; label: string }> = [
-    { key: 'bookings',  label: 'Bookings'  },
-    { key: 'pricing',   label: 'Pricing'   },
-    { key: 'addons',    label: 'Add-Ons'   },
-    { key: 'protocols', label: 'Protocols' },
-    { key: 'products',  label: 'Products'  },
-    { key: 'settings',  label: 'Settings'  },
-    { key: 'calendar',  label: 'Calendar'  },
-    { key: 'admins',    label: 'Admins'    },
+    { key: 'bookings', label: 'Bookings' },
+    { key: 'services', label: 'Services' },
+    { key: 'products', label: 'Products' },
+    { key: 'settings', label: 'Settings' },
+    { key: 'calendar', label: 'Calendar' },
+    { key: 'admins',   label: 'Admins'   },
   ]
 
   const upcomingCount = bookings?.filter(b => {
@@ -200,23 +184,31 @@ export default function Dashboard({ adminEmail }: { adminEmail: string }) {
           />
         )}
 
-        {!loading && tab === 'pricing' && services && (
-          <PricingTab
+        {!loading && tab === 'services' && services && addons && protocols && products && (
+          <ServicesTab
             services={services}
             setServices={u => setServices(s => s && u(s))}
-            onSave={savePricing}
+            addons={addons}
+            setAddons={u => setAddons(a => a && u(a))}
+            protocols={protocols}
+            setProtocols={u => setProtocols(p => p && u(p))}
+            products={products}
+            setProducts={u => setProducts(p => p && u(p))}
+            onSave={saveServicesTab}
             saving={saving}
             message={saveMsg}
           />
         )}
 
-        {!loading && tab === 'addons' && addons && (
-          <AddonsTab
-            addons={addons}
-            setAddons={u => setAddons(a => a && u(a))}
-            onSave={saveAddons}
+        {!loading && tab === 'products' && products && services && addons && (
+          <ProductsTab
+            products={products}
+            setProducts={u => setProducts(p => p && u(p))}
+            onSave={saveProducts}
             saving={saving}
             message={saveMsg}
+            services={services}
+            addons={addons}
           />
         )}
 
@@ -238,37 +230,6 @@ export default function Dashboard({ adminEmail }: { adminEmail: string }) {
             saveCalendar={saveCalendar}
             saving={calSaving}
             message={calMsg}
-          />
-        )}
-
-        {!loading && tab === 'protocols' && protocols && products && services && addons && (
-          <ProtocolsTab
-            protocols={protocols}
-            setProtocols={u => setProtocols(p => p && u(p))}
-            products={products}
-            setProducts={u => setProducts(p => p && u(p))}
-            onSave={async () => {
-              // Save both protocols + products in one click — they're typically
-              // edited together (new product created mid-step → both dirty).
-              await saveProtocols()
-              await saveProducts()
-            }}
-            saving={saving}
-            message={saveMsg}
-            services={services}
-            addons={addons}
-          />
-        )}
-
-        {!loading && tab === 'products' && products && services && addons && (
-          <ProductsTab
-            products={products}
-            setProducts={u => setProducts(p => p && u(p))}
-            onSave={saveProducts}
-            saving={saving}
-            message={saveMsg}
-            services={services}
-            addons={addons}
           />
         )}
 

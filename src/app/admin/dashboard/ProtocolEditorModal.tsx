@@ -24,7 +24,6 @@ import {
   type ProtocolStep,
 } from '@/lib/prep-mapping'
 import type { ServicesData, AddonsData } from './types'
-import { Label, SaveBar } from './ui'
 import { QuickAddProductModal } from './ProductsTab'
 
 const inputStyle: React.CSSProperties = {
@@ -41,14 +40,7 @@ function newStepId(): string {
   return 's-' + Math.random().toString(36).slice(2, 9)
 }
 
-const FACIAL_ORDER: Array<{ id: string; fallback: string }> = [
-  { id: 'signature', fallback: 'The Beautywell Signature' },
-  { id: 'hydralux', fallback: 'HydraLux Infusion' },
-  { id: 'liquidfacelift', fallback: 'The Liquid Facelift' },
-  { id: 'lumin', fallback: 'Lumin LED Therapy' },
-]
-
-// ── Product picker (dropdown shown next to a step) ─────────────────────────
+// ── Product picker dropdown ────────────────────────────────────────────────
 function ProductPickerDropdown({
   products,
   excludeIds,
@@ -70,7 +62,6 @@ function ProductPickerDropdown({
     return remaining.filter((p) => p.label.toLowerCase().includes(q))
   }, [products, excludeIds, query])
 
-  // Group filtered by brand for visual grouping.
   const grouped = useMemo(() => {
     const map = new Map<string, Product[]>()
     for (const p of filtered) {
@@ -152,7 +143,7 @@ function ProductPickerDropdown({
   )
 }
 
-// ── A single sortable step row ────────────────────────────────────────────
+// ── Sortable step row ─────────────────────────────────────────────────────
 function SortableStep({
   step,
   index,
@@ -211,7 +202,6 @@ function SortableStep({
         </span>
 
         <div style={{ flex: 1, minWidth: 0 }}>
-          {/* Action input + step preview */}
           <input
             type="text"
             value={step.action}
@@ -220,7 +210,6 @@ function SortableStep({
             style={{ ...inputStyle, width: '100%' }}
           />
 
-          {/* Selected products as chips */}
           <div style={{ display: 'flex', flexWrap: 'wrap', gap: '4px', marginTop: '8px', alignItems: 'center', position: 'relative' }}>
             {step.productIds.map((pid) => {
               const p = productsById.get(pid)
@@ -250,7 +239,6 @@ function SortableStep({
             </button>
           </div>
 
-          {/* Combinator + suffix row */}
           <div style={{ display: 'flex', gap: '6px', marginTop: '8px', alignItems: 'center', flexWrap: 'wrap' }}>
             {showCombinator && (
               <label style={{ fontSize: '10px', letterSpacing: '1.2px', textTransform: 'uppercase', color: '#7a7268', display: 'flex', alignItems: 'center', gap: '4px' }}>
@@ -274,7 +262,6 @@ function SortableStep({
             />
           </div>
 
-          {/* Preview */}
           {preview && (
             <div style={{ marginTop: '8px', padding: '6px 10px', background: '#f5f1e8', borderRadius: '3px', fontSize: '12px', color: '#5c4638', fontStyle: 'italic' }}>
               → {preview}
@@ -295,27 +282,26 @@ function SortableStep({
   )
 }
 
-// ── Per-facial protocol editor ──────────────────────────────────────────────
-function FacialProtocolEditor({
-  facialId,
-  facialName,
+// ── Full-screen protocol editor modal ─────────────────────────────────────
+export default function ProtocolEditorModal({
+  serviceName,
   steps,
+  onChangeSteps,
   products,
   setProducts,
-  onChangeSteps,
   services,
   addons,
+  onClose,
 }: {
-  facialId: string
-  facialName: string
+  serviceName: string
   steps: ProtocolStep[]
+  onChangeSteps: (next: ProtocolStep[]) => void
   products: Product[]
   setProducts: (updater: (p: Product[]) => Product[]) => void
-  onChangeSteps: (next: ProtocolStep[]) => void
   services: ServicesData
   addons: AddonsData
+  onClose: () => void
 }) {
-  const [collapsed, setCollapsed] = useState(false)
   const [pickerForStep, setPickerForStep] = useState<string | null>(null)
   const [quickAddForStep, setQuickAddForStep] = useState<string | null>(null)
 
@@ -357,23 +343,75 @@ function FacialProtocolEditor({
   }
 
   return (
-    <div style={{ background: '#faf7ef', border: '1px solid #c5cfbe', borderRadius: '6px', padding: '12px', marginBottom: '14px' }}>
-      <button
-        type="button"
-        onClick={() => setCollapsed((v) => !v)}
-        style={{ display: 'flex', alignItems: 'center', gap: '8px', width: '100%', padding: '4px 0', background: 'none', border: 'none', cursor: 'pointer', fontFamily: 'inherit', textAlign: 'left' }}
+    <div
+      style={{
+        position: 'fixed',
+        inset: 0,
+        background: 'rgba(42, 38, 32, 0.5)',
+        zIndex: 90,
+        display: 'flex',
+        alignItems: 'stretch',
+        justifyContent: 'center',
+        padding: '0',
+      }}
+      onClick={onClose}
+    >
+      <div
+        style={{
+          background: '#faf7ef',
+          width: '100%',
+          maxWidth: '760px',
+          maxHeight: '100vh',
+          overflowY: 'auto',
+          display: 'flex',
+          flexDirection: 'column',
+          boxShadow: '0 0 60px rgba(42,38,32,0.3)',
+        }}
+        onClick={(e) => e.stopPropagation()}
       >
-        <span style={{ fontSize: '12px', color: '#7a7268' }}>{collapsed ? '▸' : '▾'}</span>
-        <span style={{ fontFamily: "'Cormorant Garamond',serif", fontSize: '20px', color: '#3d5240', fontStyle: 'italic', flex: 1 }}>
-          {facialName}
-        </span>
-        <span style={{ fontSize: '11px', color: '#7a7268' }}>
-          {steps.length} step{steps.length === 1 ? '' : 's'}
-        </span>
-      </button>
+        {/* Sticky header */}
+        <div
+          style={{
+            position: 'sticky',
+            top: 0,
+            zIndex: 5,
+            background: '#3d5240',
+            color: '#faf7ef',
+            padding: '14px 20px',
+            display: 'flex',
+            justifyContent: 'space-between',
+            alignItems: 'center',
+            gap: '12px',
+          }}
+        >
+          <div style={{ minWidth: 0 }}>
+            <div style={{ fontSize: '9px', letterSpacing: '2.5px', textTransform: 'uppercase', color: 'rgba(197,207,190,0.75)' }}>
+              Editing protocol
+            </div>
+            <div style={{ fontFamily: "'Cormorant Garamond',serif", fontStyle: 'italic', fontSize: '22px', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+              {serviceName}
+            </div>
+          </div>
+          <button
+            type="button"
+            onClick={onClose}
+            style={{ background: 'none', border: '1px solid rgba(197,207,190,0.35)', color: 'rgba(197,207,190,0.9)', padding: '8px 16px', fontSize: '11px', letterSpacing: '1.5px', textTransform: 'uppercase', cursor: 'pointer', borderRadius: '3px', fontFamily: 'inherit', flexShrink: 0 }}
+          >
+            Done
+          </button>
+        </div>
 
-      {!collapsed && (
-        <div style={{ marginTop: '12px' }}>
+        <div style={{ padding: '20px', flex: 1 }}>
+          <p style={{ fontSize: '12px', color: '#7a7268', marginBottom: '14px', lineHeight: 1.6 }}>
+            Drag the ⋮⋮ handle to reorder. Click a step to edit. Products link to the editable Products library — new products created here are added there too. Changes save when you click <strong>Save Changes</strong> on the Services tab.
+          </p>
+
+          {steps.length === 0 && (
+            <div style={{ textAlign: 'center', padding: '32px 16px', color: '#7a7268', fontSize: '13px', fontStyle: 'italic', border: '1px dashed #c5cfbe', borderRadius: '4px', marginBottom: '14px' }}>
+              No steps yet. Tap <strong>Add step</strong> below to start.
+            </div>
+          )}
+
           <DndContext sensors={sensors} onDragEnd={handleDragEnd}>
             <SortableContext items={steps.map((s) => s.id)} strategy={verticalListSortingStrategy}>
               {steps.map((step, idx) => (
@@ -411,81 +449,21 @@ function FacialProtocolEditor({
           <button
             type="button"
             onClick={addStep}
-            style={{ width: '100%', padding: '10px', background: 'none', color: '#3d5240', border: '1px dashed #c5cfbe', borderRadius: '3px', fontSize: '11px', letterSpacing: '1.5px', textTransform: 'uppercase', cursor: 'pointer', fontFamily: 'inherit', marginTop: '6px' }}
+            style={{ width: '100%', padding: '12px', background: 'none', color: '#3d5240', border: '1px dashed #c5cfbe', borderRadius: '3px', fontSize: '11px', letterSpacing: '1.5px', textTransform: 'uppercase', cursor: 'pointer', fontFamily: 'inherit', marginTop: '6px' }}
           >
             + Add step
           </button>
         </div>
-      )}
 
-      {quickAddForStep !== null && (
-        <QuickAddProductModal
-          onClose={() => setQuickAddForStep(null)}
-          onCreate={(p) => handleNewProductFromStep(quickAddForStep, p)}
-          services={services}
-          addons={addons}
-        />
-      )}
-    </div>
-  )
-}
-
-// ── Main ProtocolsTab ──────────────────────────────────────────────────────
-export default function ProtocolsTab({
-  protocols,
-  setProtocols,
-  products,
-  setProducts,
-  onSave,
-  saving,
-  message,
-  services,
-  addons,
-}: {
-  protocols: Record<string, ProtocolStep[]>
-  setProtocols: (updater: (p: Record<string, ProtocolStep[]>) => Record<string, ProtocolStep[]>) => void
-  products: Product[]
-  setProducts: (updater: (p: Product[]) => Product[]) => void
-  onSave: () => void
-  saving: boolean
-  message: string
-  services: ServicesData
-  addons: AddonsData
-}) {
-  const facialNameById = useMemo(() => {
-    const m = new Map<string, string>()
-    for (const f of services.facials) m.set(f.id, f.name)
-    return m
-  }, [services])
-
-  return (
-    <>
-      <Label>Treatment Protocols</Label>
-      <p style={{ fontSize: '12px', color: '#7a7268', marginBottom: '14px', lineHeight: 1.6 }}>
-        The validated step-by-step order for each facial. Drag the ⋮⋮ handle to reorder; click a step to edit. Products link to the editable Products library — new products created here are added there too.
-      </p>
-
-      {FACIAL_ORDER.map(({ id, fallback }) => {
-        const steps = protocols[id] ?? []
-        const name = facialNameById.get(id) ?? fallback
-        return (
-          <FacialProtocolEditor
-            key={id}
-            facialId={id}
-            facialName={name}
-            steps={steps}
-            products={products}
-            setProducts={setProducts}
-            onChangeSteps={(next) =>
-              setProtocols((all) => ({ ...all, [id]: next }))
-            }
+        {quickAddForStep !== null && (
+          <QuickAddProductModal
+            onClose={() => setQuickAddForStep(null)}
+            onCreate={(p) => handleNewProductFromStep(quickAddForStep, p)}
             services={services}
             addons={addons}
           />
-        )
-      })}
-
-      <SaveBar onSave={onSave} saving={saving} message={message} />
-    </>
+        )}
+      </div>
+    </div>
   )
 }
