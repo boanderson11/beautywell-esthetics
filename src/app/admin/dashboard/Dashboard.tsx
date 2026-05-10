@@ -4,6 +4,7 @@ import { useCallback, useEffect, useState } from 'react'
 import { useRouter } from 'next/navigation'
 
 import type { ServicesData, AddonsData, Settings, CalendarData, Booking } from './types'
+import type { Product, ProtocolStep, ProductsPayload, ProtocolsPayload } from '@/lib/prep-mapping'
 import { loadContent, saveContent, loadBookings } from './api-client'
 
 import PricingTab from './PricingTab'
@@ -12,8 +13,18 @@ import SettingsTab from './SettingsTab'
 import CalendarTab from './CalendarTab'
 import BookingsTab from './BookingsTab'
 import AdminsTab from './AdminsTab'
+import ProductsTab from './ProductsTab'
+import ProtocolsTab from './ProtocolsTab'
 
-type TabKey = 'bookings' | 'pricing' | 'addons' | 'settings' | 'calendar' | 'admins'
+type TabKey =
+  | 'bookings'
+  | 'pricing'
+  | 'addons'
+  | 'protocols'
+  | 'products'
+  | 'settings'
+  | 'calendar'
+  | 'admins'
 
 export default function Dashboard({ adminEmail }: { adminEmail: string }) {
   const router = useRouter()
@@ -24,6 +35,8 @@ export default function Dashboard({ adminEmail }: { adminEmail: string }) {
   const [settings, setSettings] = useState<Settings | null>(null)
   const [cal, setCal] = useState<CalendarData | null>(null)
   const [bookings, setBookings] = useState<Booking[] | null>(null)
+  const [products, setProducts] = useState<Product[] | null>(null)
+  const [protocols, setProtocols] = useState<Record<string, ProtocolStep[]> | null>(null)
   const [loading, setLoading] = useState(true)
 
   const [saving, setSaving] = useState(false)
@@ -34,14 +47,17 @@ export default function Dashboard({ adminEmail }: { adminEmail: string }) {
   const reload = useCallback(async () => {
     setLoading(true)
     try {
-      const [s, a, st, c, b] = await Promise.all([
+      const [s, a, st, c, b, pr, pc] = await Promise.all([
         loadContent<ServicesData>('services'),
         loadContent<AddonsData>('addons'),
         loadContent<Settings>('settings'),
         loadContent<CalendarData>('calendar'),
         loadBookings<Booking[]>(),
+        loadContent<ProductsPayload>('products'),
+        loadContent<ProtocolsPayload>('protocols'),
       ])
       setServices(s); setAddons(a); setSettings(st); setCal(c); setBookings(b)
+      setProducts(pr.products); setProtocols(pc.protocols)
     } catch (e) {
       console.error('[dashboard] load failed', e)
     }
@@ -96,16 +112,38 @@ export default function Dashboard({ adminEmail }: { adminEmail: string }) {
     setCalSaving(false)
   }
 
+  async function saveProducts() {
+    if (!products) return
+    setSaving(true); setSaveMsg('')
+    try {
+      await saveContent('products', { products })
+      setSaveMsg('✓ Saved')
+    } catch { setSaveMsg('Save failed. Please try again.') }
+    setSaving(false)
+  }
+
+  async function saveProtocols() {
+    if (!protocols) return
+    setSaving(true); setSaveMsg('')
+    try {
+      await saveContent('protocols', { protocols })
+      setSaveMsg('✓ Saved')
+    } catch { setSaveMsg('Save failed. Please try again.') }
+    setSaving(false)
+  }
+
   // Reset save message when switching tabs.
   useEffect(() => { setSaveMsg('') }, [tab])
 
   const TABS: Array<{ key: TabKey; label: string }> = [
-    { key: 'bookings', label: 'Bookings' },
-    { key: 'pricing',  label: 'Pricing'  },
-    { key: 'addons',   label: 'Add-Ons'  },
-    { key: 'settings', label: 'Settings' },
-    { key: 'calendar', label: 'Calendar' },
-    { key: 'admins',   label: 'Admins'   },
+    { key: 'bookings',  label: 'Bookings'  },
+    { key: 'pricing',   label: 'Pricing'   },
+    { key: 'addons',    label: 'Add-Ons'   },
+    { key: 'protocols', label: 'Protocols' },
+    { key: 'products',  label: 'Products'  },
+    { key: 'settings',  label: 'Settings'  },
+    { key: 'calendar',  label: 'Calendar'  },
+    { key: 'admins',    label: 'Admins'    },
   ]
 
   const upcomingCount = bookings?.filter(b => {
@@ -200,6 +238,37 @@ export default function Dashboard({ adminEmail }: { adminEmail: string }) {
             saveCalendar={saveCalendar}
             saving={calSaving}
             message={calMsg}
+          />
+        )}
+
+        {!loading && tab === 'protocols' && protocols && products && services && addons && (
+          <ProtocolsTab
+            protocols={protocols}
+            setProtocols={u => setProtocols(p => p && u(p))}
+            products={products}
+            setProducts={u => setProducts(p => p && u(p))}
+            onSave={async () => {
+              // Save both protocols + products in one click — they're typically
+              // edited together (new product created mid-step → both dirty).
+              await saveProtocols()
+              await saveProducts()
+            }}
+            saving={saving}
+            message={saveMsg}
+            services={services}
+            addons={addons}
+          />
+        )}
+
+        {!loading && tab === 'products' && products && services && addons && (
+          <ProductsTab
+            products={products}
+            setProducts={u => setProducts(p => p && u(p))}
+            onSave={saveProducts}
+            saving={saving}
+            message={saveMsg}
+            services={services}
+            addons={addons}
           />
         )}
 

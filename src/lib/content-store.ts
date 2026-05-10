@@ -9,7 +9,14 @@ import fs from 'node:fs';
 import path from 'node:path';
 import { db } from './db';
 
-export const CONTENT_KEYS = ['services', 'addons', 'settings', 'calendar'] as const;
+export const CONTENT_KEYS = [
+  'services',
+  'addons',
+  'settings',
+  'calendar',
+  'protocols',
+  'products',
+] as const;
 export type ContentKey = (typeof CONTENT_KEYS)[number];
 
 export function isContentKey(s: string): s is ContentKey {
@@ -21,6 +28,8 @@ const FALLBACK_FILE: Record<ContentKey, string> = {
   addons: 'addons.json',
   settings: 'settings.json',
   calendar: 'calendar.json',
+  protocols: 'protocols.json',
+  products: 'products.json',
 };
 
 function readJsonFallback(key: ContentKey): unknown {

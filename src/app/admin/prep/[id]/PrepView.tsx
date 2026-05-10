@@ -6,12 +6,15 @@ import Link from 'next/link';
 import {
   ROOM_SETUP,
   EQUIPMENT,
-  PRODUCTS,
   DISPOSABLES,
   BRAND_LABEL,
-  selectItems,
+  indexProducts,
   protocolFor,
+  renderStep,
+  selectItems,
   type ChecklistItem,
+  type Product,
+  type ProtocolStep,
 } from '@/lib/prep-mapping';
 import type { PrepBooking } from './page';
 
@@ -111,10 +114,14 @@ export default function PrepView({
   booking: dbBooking,
   bookingId,
   source,
+  products,
+  protocols,
 }: {
   booking: PrepBooking | null;
   bookingId: string;
   source: 'db' | 'manual';
+  products: Product[];
+  protocols: Record<string, ProtocolStep[]>;
 }) {
   const router = useRouter();
   const [hydratedBooking, setHydratedBooking] = useState<PrepBooking | null>(
@@ -164,9 +171,23 @@ export default function PrepView({
 
   const booking = hydratedBooking;
 
+  const productsById = useMemo(() => indexProducts(products), [products]);
+
   const sections = useMemo<SectionDef[]>(() => {
     if (!booking) return [];
     const addonIds = booking.addons.map((a) => a.id);
+    // Products are admin-editable; map to the same ChecklistItem shape so the
+    // existing Section renderer doesn't need to know the difference.
+    const productItems: ChecklistItem[] = selectItems(
+      products,
+      booking.serviceId,
+      addonIds,
+    ).map((p) => ({
+      id: p.id,
+      label: p.label,
+      brand: p.brand,
+      triggers: p.triggers,
+    }));
     return [
       {
         key: 'room',
@@ -184,7 +205,7 @@ export default function PrepView({
         key: 'products',
         icon: '🧴',
         title: 'Products to Pull',
-        items: selectItems(PRODUCTS, booking.serviceId, addonIds),
+        items: productItems,
       },
       {
         key: 'disposables',
@@ -193,11 +214,11 @@ export default function PrepView({
         items: selectItems(DISPOSABLES, booking.serviceId, addonIds),
       },
     ];
-  }, [booking]);
+  }, [booking, products]);
 
   const protocol = useMemo(
-    () => (booking ? protocolFor(booking.serviceId) : null),
-    [booking],
+    () => (booking ? protocolFor(protocols, booking.serviceId) : null),
+    [booking, protocols],
   );
 
   const totalItems = sections.reduce((s, sec) => s + sec.items.length, 0);
@@ -354,10 +375,10 @@ export default function PrepView({
           <div className="prep-card prep-protocol">
             <div className="prep-protocol-title">Treatment Order</div>
             <ol className="prep-protocol-steps">
-              {protocol.map((step) => (
-                <li key={step.n}>
-                  <span className="prep-protocol-num">{step.n}</span>
-                  <span className="prep-protocol-text">{step.text}</span>
+              {protocol.map((step, idx) => (
+                <li key={step.id}>
+                  <span className="prep-protocol-num">{idx + 1}</span>
+                  <span className="prep-protocol-text">{renderStep(step, productsById)}</span>
                 </li>
               ))}
             </ol>

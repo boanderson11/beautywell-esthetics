@@ -1,13 +1,11 @@
-// Prep-sheet mapping data. Drives the four checklist sections (Room Setup,
-// Equipment, Products, Disposables) and the Treatment Order quick reference
-// shown on /admin/prep/[id]. Pure data + a small selector — nothing reactive.
+// Prep-sheet mapping data + helpers. Drives the four checklist sections
+// (Room Setup, Equipment, Products, Disposables) and the Treatment Order quick
+// reference shown on /admin/prep/[id].
 //
-// The brief was written with a fresh-install set of service IDs (`led`,
-// `microcurrent`, `ledboost`, `seruminfusion`, `eyerescue`, `liprenewal`,
-// `collagenmask`, `waxlip`, etc.). The live `content/services.json` and
-// `content/addons.json` use a different set: `lumin`, `nuface`, `led`,
-// `serum`, `eye`, `lip`, `collagen`, `wax-lip`, `wax-brow`, `wax-combo`.
-// Everything below uses the live IDs.
+// Products and Protocols are now editable through the admin dashboard and live
+// in content_blocks (with on-disk fallbacks in content/products.json and
+// content/protocols.json). Room setup, equipment, and disposables remain in
+// code — they're operational and rarely change.
 
 export type FacialId = 'signature' | 'hydralux' | 'liquidfacelift' | 'lumin';
 export type AddonId =
@@ -46,9 +44,31 @@ export type Brand =
   | 'laneige'
   | 'generic';
 
+export const BRAND_KEYS: readonly Brand[] = [
+  'dermalogica',
+  'image',
+  'esthemax',
+  'biodance',
+  'cosdebaha',
+  'laneige',
+  'generic',
+];
+
+export const BRAND_LABEL: Record<Brand, string> = {
+  dermalogica: 'Dermalogica',
+  image: 'IMAGE',
+  esthemax: 'Esthemax',
+  biodance: 'Biodance',
+  cosdebaha: 'Cos De BAHA',
+  laneige: 'Laneige',
+  generic: '',
+};
+
 export type Trigger =
   | { service: ServiceId }
   | { addon: AddonId }
+  | { service?: string }
+  | { addon?: string }
   | { anyFacial: true }
   | { anyWaxing: true }
   | { anyBrowWax: true };
@@ -61,9 +81,7 @@ export type ChecklistItem = {
   triggers: Trigger[];
 };
 
-export type ProtocolStep = { n: number; text: string };
-
-// ── Section 1: Room Setup ───────────────────────────────────────────────────
+// ── Section 1: Room Setup (in-code; not Paulina-editable in v1) ─────────────
 export const ROOM_SETUP: ChecklistItem[] = [
   {
     id: 'room-sheet',
@@ -97,7 +115,7 @@ export const ROOM_SETUP: ChecklistItem[] = [
   },
 ];
 
-// ── Section 2: Equipment ────────────────────────────────────────────────────
+// ── Section 2: Equipment (in-code) ──────────────────────────────────────────
 export const EQUIPMENT: ChecklistItem[] = [
   {
     id: 'eq-nuface',
@@ -151,248 +169,7 @@ export const EQUIPMENT: ChecklistItem[] = [
   },
 ];
 
-// ── Section 3: Products ─────────────────────────────────────────────────────
-// Each product appears if ANY of its trigger services/add-ons are in the booking.
-// Brand badges are intentionally surfaced here — this is a back-of-house tool,
-// never seen by clients.
-export const PRODUCTS: ChecklistItem[] = [
-  // Cleansers
-  {
-    id: 'p-precleanse',
-    label: 'PreCleanse Balm',
-    brand: 'dermalogica',
-    triggers: [{ service: 'signature' }, { service: 'hydralux' }, { service: 'lumin' }],
-  },
-  {
-    id: 'p-special-cleansing-gel',
-    label: 'Special Cleansing Gel',
-    brand: 'dermalogica',
-    triggers: [{ service: 'signature' }, { service: 'lumin' }],
-  },
-  {
-    id: 'p-intensive-moisture-cleanser',
-    label: 'Intensive Moisture Cleanser',
-    brand: 'dermalogica',
-    triggers: [{ service: 'hydralux' }],
-  },
-  {
-    id: 'p-vital-c-cleanser',
-    label: 'Vital C Hydrating Cleanser',
-    brand: 'image',
-    triggers: [{ service: 'liquidfacelift' }],
-  },
-  {
-    id: 'p-ormedic-cleanser',
-    label: 'Ormedic Balancing Cleanser',
-    brand: 'image',
-    triggers: [{ service: 'liquidfacelift' }],
-  },
-
-  // Toner / serum-toner hybrids
-  {
-    id: 'p-pro-multi-active-toner',
-    label: 'PRO Multi-Active Toner',
-    brand: 'dermalogica',
-    triggers: [
-      { service: 'signature' },
-      { service: 'hydralux' },
-      { service: 'lumin' },
-      { addon: 'dermaplaning' },
-    ],
-  },
-  {
-    id: 'p-ormedic-balancing-serum',
-    label: 'Ormedic Balancing Antioxidant Serum',
-    brand: 'image',
-    triggers: [{ service: 'liquidfacelift' }],
-  },
-
-  // Exfoliants / enzyme
-  {
-    id: 'p-daily-microfoliant',
-    label: 'Daily Microfoliant',
-    brand: 'dermalogica',
-    triggers: [{ service: 'signature' }],
-  },
-  {
-    id: 'p-exfoliant-accelerator',
-    label: 'Exfoliant Accelerator',
-    brand: 'dermalogica',
-    triggers: [{ service: 'signature' }],
-  },
-  {
-    id: 'p-multi-active-scaling-gel',
-    label: 'Multi-Active Scaling Gel',
-    brand: 'dermalogica',
-    triggers: [{ service: 'hydralux' }],
-  },
-  {
-    id: 'p-multivitamin-thermafoliant',
-    label: 'MultiVitamin Thermafoliant',
-    brand: 'dermalogica',
-    triggers: [{ service: 'lumin' }],
-  },
-  {
-    id: 'p-calming-botanical-mixer',
-    label: 'Calming Botanical Mixer',
-    brand: 'dermalogica',
-    triggers: [{ service: 'lumin' }],
-  },
-
-  // Treatments / massage / conductive
-  {
-    id: 'p-post-extraction-solution',
-    label: 'Post Extraction Solution',
-    brand: 'dermalogica',
-    triggers: [{ service: 'signature' }],
-  },
-  {
-    id: 'p-pro-massage-gel-cream',
-    label: 'PRO Massage Gel-Cream',
-    brand: 'dermalogica',
-    triggers: [{ service: 'signature' }, { addon: 'guasha' }],
-  },
-  {
-    id: 'p-pro-conductive-masque',
-    label: 'PRO Conductive Masque Base',
-    brand: 'dermalogica',
-    triggers: [{ service: 'liquidfacelift' }, { addon: 'nuface' }],
-  },
-
-  // Masks
-  {
-    id: 'p-hydrojelly-ha',
-    label: 'Hydrojelly — Hyaluronic Acid',
-    brand: 'esthemax',
-    triggers: [{ service: 'signature' }, { service: 'hydralux' }],
-  },
-  {
-    id: 'p-hydrojelly-vitc',
-    label: 'Hydrojelly — Vitamin C',
-    brand: 'esthemax',
-    triggers: [{ service: 'signature' }],
-  },
-  {
-    id: 'p-biodance-collagen',
-    label: 'Biodance Collagen Mask',
-    brand: 'biodance',
-    triggers: [{ service: 'liquidfacelift' }, { addon: 'collagen' }],
-  },
-  {
-    id: 'p-biocellulose-sheet',
-    label: 'Bio-cellulose collagen sheet mask',
-    brand: 'generic',
-    triggers: [{ service: 'hydralux' }],
-  },
-
-  // Serums
-  {
-    id: 'p-cosdebaha-ha-serum',
-    label: 'Pure Hyaluronic Acid Serum',
-    brand: 'cosdebaha',
-    triggers: [{ service: 'hydralux' }, { addon: 'serum' }],
-  },
-  {
-    id: 'p-biolumin-c-serum',
-    label: 'BioLumin-C Serum',
-    brand: 'dermalogica',
-    triggers: [{ service: 'signature' }],
-  },
-  {
-    id: 'p-circular-hydration-serum',
-    label: 'Circular Hydration Serum',
-    brand: 'dermalogica',
-    triggers: [{ service: 'lumin' }],
-  },
-  {
-    id: 'p-max-stem-cell-serum',
-    label: 'The MAX Stem Cell Serum',
-    brand: 'image',
-    triggers: [{ service: 'liquidfacelift' }, { addon: 'eye' }, { addon: 'serum' }],
-  },
-  {
-    id: 'p-vital-c-ace-serum',
-    label: 'Vital C Hydrating ACE Serum',
-    brand: 'image',
-    triggers: [{ service: 'liquidfacelift' }],
-  },
-
-  // Moisturizers / SPF
-  {
-    id: 'p-active-moist',
-    label: 'Active Moist',
-    brand: 'dermalogica',
-    triggers: [{ service: 'signature' }, { service: 'lumin' }],
-  },
-  {
-    id: 'p-skin-smoothing-cream',
-    label: 'Skin Smoothing Cream',
-    brand: 'dermalogica',
-    triggers: [{ service: 'hydralux' }],
-  },
-  {
-    id: 'p-physical-defense-spf30',
-    label: 'Invisible Physical Defense SPF 30',
-    brand: 'dermalogica',
-    triggers: [{ service: 'signature' }, { service: 'hydralux' }, { service: 'lumin' }],
-  },
-  {
-    id: 'p-vital-c-facial-oil',
-    label: 'Vital C Hydrating Facial Oil',
-    brand: 'image',
-    triggers: [{ service: 'liquidfacelift' }],
-  },
-  {
-    id: 'p-max-stem-cell-creme',
-    label: 'The MAX Stem Cell Crème',
-    brand: 'image',
-    triggers: [{ service: 'liquidfacelift' }],
-  },
-  {
-    id: 'p-daily-prevention-spf50',
-    label: 'Daily Prevention SPF 50',
-    brand: 'image',
-    triggers: [{ service: 'liquidfacelift' }],
-  },
-
-  // Lip / eye add-on products
-  {
-    id: 'p-laneige-lip-mask',
-    label: 'Laneige Lip Sleeping Mask',
-    brand: 'laneige',
-    triggers: [{ addon: 'lip' }],
-  },
-  {
-    id: 'p-lip-sugar-scrub',
-    label: 'Lip sugar scrub',
-    triggers: [{ addon: 'lip' }],
-  },
-  {
-    id: 'p-undereye-patches',
-    label: 'Hydrogel under-eye patches',
-    brand: 'generic',
-    triggers: [{ addon: 'eye' }],
-  },
-
-  // Wax-line products
-  {
-    id: 'p-prewax-cleanser',
-    label: 'Pre-wax cleanser',
-    triggers: [{ anyWaxing: true }],
-  },
-  {
-    id: 'p-hard-wax',
-    label: 'Hard wax',
-    triggers: [{ anyWaxing: true }],
-  },
-  {
-    id: 'p-postwax-oil',
-    label: 'Post-wax soothing oil',
-    triggers: [{ anyWaxing: true }],
-  },
-];
-
-// ── Section 4: Disposables ──────────────────────────────────────────────────
+// ── Section 4: Disposables (in-code) ────────────────────────────────────────
 export const DISPOSABLES: ChecklistItem[] = [
   {
     id: 'd-fan-brush',
@@ -447,92 +224,97 @@ export const DISPOSABLES: ChecklistItem[] = [
   },
 ];
 
-// ── Treatment Order Quick Reference ─────────────────────────────────────────
-// Paulina's actual validated workflow per facial. Toner deliberately comes
-// AFTER the mask in every protocol.
-export const PROTOCOLS: Record<FacialId, ProtocolStep[]> = {
-  signature: [
-    { n: 1, text: 'First cleanse — PreCleanse Balm' },
-    { n: 2, text: 'Second cleanse — Special Cleansing Gel' },
-    { n: 3, text: 'Exfoliation — Daily Microfoliant or Exfoliant Accelerator' },
-    { n: 4, text: 'Extractions under mag lamp' },
-    { n: 5, text: 'Post Extraction Solution' },
-    { n: 6, text: 'Massage — PRO Massage Gel-Cream' },
-    { n: 7, text: 'Mask — Hydrojelly HA or Vitamin C (10–15 min)' },
-    { n: 8, text: 'Tone — PRO Multi-Active Toner' },
-    { n: 9, text: 'Serum — BioLumin-C Serum' },
-    { n: 10, text: 'Finish — Active Moist + SPF 30' },
-  ],
-  hydralux: [
-    { n: 1, text: 'First cleanse — PreCleanse Balm' },
-    { n: 2, text: 'Second cleanse — Intensive Moisture Cleanser' },
-    { n: 3, text: 'Light exfoliation — Multi-Active Scaling Gel' },
-    { n: 4, text: 'Mask — Bio-cellulose or Hydrojelly HA (10–15 min)' },
-    { n: 5, text: 'Tone — PRO Multi-Active Toner' },
-    { n: 6, text: 'HA Layering — 3 layers on damp skin' },
-    { n: 7, text: 'Finish — Skin Smoothing Cream + SPF 30' },
-  ],
-  liquidfacelift: [
-    { n: 1, text: 'First cleanse — Vital C Hydrating Cleanser' },
-    { n: 2, text: 'Second cleanse — Ormedic Balancing Cleanser' },
-    { n: 3, text: 'Conductive medium — PRO Conductive Masque Base' },
-    { n: 4, text: 'Mask — Biodance Collagen Mask' },
-    { n: 5, text: 'Tone — Ormedic Balancing Antioxidant Serum' },
-    { n: 6, text: 'Peptide infusion — The MAX Stem Cell Serum' },
-    { n: 7, text: 'Microcurrent sculpting — NuFace' },
-    { n: 8, text: 'Vitamin C — Vital C Hydrating ACE Serum' },
-    { n: 9, text: 'Finish — Facial Oil + MAX Crème + SPF 50' },
-  ],
-  lumin: [
-    { n: 1, text: 'First cleanse — PreCleanse Balm' },
-    { n: 2, text: 'Second cleanse — Special Cleansing Gel' },
-    { n: 3, text: 'Enzyme — MultiVitamin Thermafoliant + Botanical Mixer' },
-    { n: 4, text: 'Tone — PRO Multi-Active Toner' },
-    { n: 5, text: 'Serum — Circular Hydration Serum' },
-    { n: 6, text: 'LED mask session (15–20 min)' },
-    { n: 7, text: 'Finish — Active Moist + SPF 30' },
-  ],
+// ── Editable types: Product + Protocol ──────────────────────────────────────
+// Persisted as JSON in content_blocks (admin-editable via /admin/dashboard) or
+// the on-disk fallback in content/products.json + content/protocols.json.
+
+export type Product = {
+  id: string;
+  label: string;
+  brand?: Brand;
+  triggers: Trigger[];
 };
 
-// ── Selection logic ─────────────────────────────────────────────────────────
+export type ProductsPayload = { products: Product[] };
+
+export type ProtocolStep = {
+  id: string;
+  action: string;        // free-text label; may be empty when the step is just a product
+  productIds: string[];  // 0+ refs into the products list
+  combinator: 'or' | '+';// joiner when multiple products
+  suffix: string;        // optional free-text after products: "(10–15 min)", etc.
+};
+
+export type ProtocolsPayload = {
+  protocols: Record<string, ProtocolStep[]>;
+};
+
+// ── Selection / rendering helpers ───────────────────────────────────────────
 function triggerMatches(
   trigger: Trigger,
   serviceId: string,
   addonIds: string[],
 ): boolean {
-  if ('service' in trigger) return trigger.service === serviceId;
-  if ('addon' in trigger) return addonIds.includes(trigger.addon);
-  if ('anyFacial' in trigger) return isFacial(serviceId);
-  if ('anyWaxing' in trigger) return isWaxing(serviceId);
-  if ('anyBrowWax' in trigger) {
+  if ('service' in trigger && trigger.service) return trigger.service === serviceId;
+  if ('addon' in trigger && trigger.addon) return addonIds.includes(trigger.addon);
+  if ('anyFacial' in trigger && trigger.anyFacial) return isFacial(serviceId);
+  if ('anyWaxing' in trigger && trigger.anyWaxing) return isWaxing(serviceId);
+  if ('anyBrowWax' in trigger && trigger.anyBrowWax) {
     return serviceId === 'wax-brow' || serviceId === 'wax-combo';
   }
   return false;
 }
 
-export function selectItems(
-  items: ChecklistItem[],
+export function selectItems<T extends { triggers: Trigger[] }>(
+  items: T[],
   serviceId: string,
   addonIds: string[],
-): ChecklistItem[] {
+): T[] {
   return items.filter((item) =>
     item.triggers.some((t) => triggerMatches(t, serviceId, addonIds)),
   );
 }
 
-export function protocolFor(serviceId: string): ProtocolStep[] | null {
-  if (isFacial(serviceId)) return PROTOCOLS[serviceId];
-  return null;
+export function protocolFor(
+  protocols: Record<string, ProtocolStep[]>,
+  serviceId: string,
+): ProtocolStep[] | null {
+  if (!isFacial(serviceId)) return null;
+  return protocols[serviceId] ?? null;
 }
 
-// Brand → human label, used for badge text. Kept here so the view layer is
-// dumb data-driven.
-export const BRAND_LABEL: Record<Brand, string> = {
-  dermalogica: 'Dermalogica',
-  image: 'IMAGE',
-  esthemax: 'Esthemax',
-  biodance: 'Biodance',
-  cosdebaha: 'Cos De BAHA',
-  laneige: 'Laneige',
-  generic: '',
-};
+// Render a structured step into a single display string. Products are looked
+// up by id; unknown ids fall back to the literal id so a dangling reference
+// is visible rather than silent.
+export function renderStep(
+  step: ProtocolStep,
+  productsById: Map<string, Product>,
+): string {
+  const productNames = step.productIds.map(
+    (id) => productsById.get(id)?.label ?? id,
+  );
+  const joined =
+    productNames.length === 0
+      ? ''
+      : productNames.length === 1
+        ? productNames[0]
+        : productNames.join(` ${step.combinator} `);
+
+  // Empty-action edge case: the step is just a product (e.g. "Post Extraction Solution").
+  const head = step.action.trim();
+  let text: string;
+  if (head && joined) text = `${head} — ${joined}`;
+  else if (head) text = head;
+  else if (joined) text = joined;
+  else text = '';
+
+  const suffix = step.suffix.trim();
+  return suffix ? `${text} ${suffix}`.trim() : text;
+}
+
+// Helper to build the products-by-id map once per render.
+export function indexProducts(products: Product[]): Map<string, Product> {
+  const m = new Map<string, Product>();
+  for (const p of products) m.set(p.id, p);
+  return m;
+}

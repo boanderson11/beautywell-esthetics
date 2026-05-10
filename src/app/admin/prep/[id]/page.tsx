@@ -1,6 +1,11 @@
 import { redirect } from 'next/navigation';
 import { getAdminSession } from '@/lib/admin-auth';
 import { db } from '@/lib/db';
+import { getContent } from '@/lib/content-store';
+import type {
+  ProductsPayload,
+  ProtocolsPayload,
+} from '@/lib/prep-mapping';
 import PrepView from './PrepView';
 
 export const runtime = 'nodejs';
@@ -53,7 +58,7 @@ async function fetchBooking(id: string): Promise<PrepBooking | null> {
     clientName: `${r.first_name} ${r.last_name}`.trim(),
     serviceId: r.service_id,
     serviceName: r.service_name,
-    servicePrice: 0, // Not stored separately on the row; total is what matters here.
+    servicePrice: 0,
     addons: (r.addons ?? []).map((a) => ({
       id: a.id ?? '',
       name: a.name,
@@ -73,14 +78,34 @@ export default async function PrepPage({ params }: { params: { id: string } }) {
     redirect(`/admin/login?next=/admin/prep/${params.id}`);
   }
 
+  // Products + protocols are admin-editable, so fetch fresh on every request.
+  const [productsPayload, protocolsPayload] = await Promise.all([
+    getContent<ProductsPayload>('products'),
+    getContent<ProtocolsPayload>('protocols'),
+  ]);
+
   // Manual entries live in admin-side localStorage only — no DB row. The
   // client component hydrates from localStorage when it sees source: 'manual'.
   if (params.id.startsWith('manual-')) {
-    return <PrepView booking={null} bookingId={params.id} source="manual" />;
+    return (
+      <PrepView
+        booking={null}
+        bookingId={params.id}
+        source="manual"
+        products={productsPayload.products}
+        protocols={protocolsPayload.protocols}
+      />
+    );
   }
 
   const booking = await fetchBooking(params.id);
   return (
-    <PrepView booking={booking} bookingId={params.id} source="db" />
+    <PrepView
+      booking={booking}
+      bookingId={params.id}
+      source="db"
+      products={productsPayload.products}
+      protocols={protocolsPayload.protocols}
+    />
   );
 }
