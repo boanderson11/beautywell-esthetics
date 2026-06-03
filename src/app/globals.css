@@ -392,6 +392,23 @@ section { padding: 120px 48px; position: relative; }
 .booking .section-title { color: var(--bone); }
 .booking .section-title em { color: var(--terracotta-soft); }
 .booking .section-intro { color: var(--sage-mist); }
+
+/* Stack the booking section-header instead of the default side-by-side grid.
+   The intro paragraph here is long (4+ wrapped lines) while the left column
+   has only a small label + one-line title, so the side-by-side layout left
+   the intro starting visually above the title text and pushed it close to
+   (or above) the section's boundary with the about section above. Stacking
+   removes the column-height-mismatch problem entirely and gives the intro
+   room to breathe. */
+.booking .section-header {
+  display: block;
+  margin-bottom: 56px;
+}
+.booking .section-header > div {
+  margin-bottom: 24px;
+  max-width: 720px;
+}
+.booking .section-intro { max-width: 640px; }
 .booking-container {
   max-width: 1400px;
   margin: 0 auto;
