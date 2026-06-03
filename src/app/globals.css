@@ -359,6 +359,13 @@ section { padding: 120px 48px; position: relative; }
   color: var(--bone);
   position: relative;
   overflow: hidden;
+  /* Own stacking context above the about section so the section-header text
+     never renders behind the cream background of the preceding section. */
+  isolation: isolate;
+  z-index: 1;
+  /* Extra breathing room above the section-header so the title clears any
+     trailing layout from the about section above. */
+  padding-top: 160px;
 }
 .booking::before {
   content: '';
@@ -1394,6 +1401,7 @@ footer .logo em { color: var(--terracotta-soft); }
   }
   .logo { font-size: 22px; }
   section { padding: 72px 20px; }
+  .booking { padding-top: 100px; }
   .hero { padding: 96px 20px 48px; min-height: auto; }
   .hero h1 { font-size: clamp(40px, 11vw, 60px); margin-bottom: 20px; }
   .hero-label { font-size: 10px; letter-spacing: 2px; margin-bottom: 20px; }
