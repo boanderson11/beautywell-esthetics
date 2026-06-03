@@ -60,7 +60,7 @@ export default async function Home() {
         </svg>
         <div className="hero-grid">
           <div>
-            <div className="hero-label">Est. 2024 · A Private Skin Studio</div>
+            <div className="hero-label">Est. 2026 · A Private Skin Studio</div>
             <h1>
               Skincare, <em>rooted</em>
               <br />
