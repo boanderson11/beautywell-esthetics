@@ -235,7 +235,11 @@ section { padding: 120px 48px; position: relative; }
   display: grid;
   grid-template-columns: 1fr 1.5fr;
   gap: 60px;
-  align-items: end;
+  /* Top-align both columns. align-items: end (bottom-align) caused the right
+     column to extend upward from the shared baseline whenever its content
+     was taller than the left column, which on the booking section pushed the
+     start of the intro paragraph above the section's green background. */
+  align-items: start;
 }
 .section-label {
   font-size: 12px;
