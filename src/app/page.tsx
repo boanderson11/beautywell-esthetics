@@ -43,7 +43,6 @@ export default async function Home() {
     hoursClosed,
     bookingNote,
     depositPolicy,
-    googleCalendarSrc,
   } = settings;
 
   return (
@@ -152,39 +151,6 @@ export default async function Home() {
             depositPolicy={depositPolicy}
             bookingNote={bookingNote}
           />
-        </div>
-      </section>
-
-      {/* ── AVAILABILITY / GOOGLE CALENDAR ───────────────────────── */}
-      <section className="calendar-embed" id="availability">
-        <div className="section-header reveal">
-          <div>
-            <div className="section-label">Availability</div>
-            <h2 className="section-title">
-              Check <em>open times.</em>
-            </h2>
-          </div>
-          <p className="section-intro">
-            View live availability below. Studio hours are Tuesday–Friday evenings and all day Saturday.
-          </p>
-        </div>
-        <div className="calendar-embed-inner reveal">
-          {googleCalendarSrc ? (
-            <iframe
-              src={googleCalendarSrc}
-              title="Beautywell Availability Calendar"
-              frameBorder="0"
-              scrolling="no"
-              style={{ border: 'none' }}
-            />
-          ) : (
-            <div className="calendar-placeholder">
-              <p>Google Calendar coming soon</p>
-              <small>
-                Add your Google Calendar embed URL in the CMS under Settings → Google Calendar URL
-              </small>
-            </div>
-          )}
         </div>
       </section>
 

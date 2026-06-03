@@ -45,7 +45,6 @@ export default function Nav() {
         <ul className="nav-links">
           <li><a href="#about">About</a></li>
           <li><a href="#booking">Services</a></li>
-          <li><a href="#availability">Availability</a></li>
           <li><a href="#contact">Contact</a></li>
         </ul>
         <a href="#booking" className="nav-cta">Book Now</a>
@@ -65,7 +64,6 @@ export default function Nav() {
       <aside className={`mobile-menu${menuOpen ? ' open' : ''}`}>
         <a href="#about" onClick={close}>About</a>
         <a href="#booking" onClick={close}>Services</a>
-        <a href="#availability" onClick={close}>Availability</a>
         <a href="#contact" onClick={close}>Contact</a>
         <a href="#booking" className="mobile-cta" onClick={close}>Book Now</a>
       </aside>
