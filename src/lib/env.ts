@@ -20,6 +20,10 @@ export const env = {
   get STRIPE_WEBHOOK_SECRET() { return required('STRIPE_WEBHOOK_SECRET'); },
   get RESEND_API_KEY() { return required('RESEND_API_KEY'); },
   get OWNER_EMAIL() { return required('OWNER_EMAIL'); },
+  // Where the public contact form submissions are delivered. Defaults to
+  // peemarie1@gmail.com so the form works the moment it ships; set the env
+  // var in Netlify to override.
+  get CONTACT_EMAIL() { return process.env.CONTACT_EMAIL || 'peemarie1@gmail.com'; },
   get FROM_EMAIL() { return process.env.FROM_EMAIL || 'Beautywell <onboarding@resend.dev>'; },
   get SITE_URL() { return required('SITE_URL'); },
   get SESSION_SECRET() {
